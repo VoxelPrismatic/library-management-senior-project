@@ -1,4 +1,11 @@
-package scrape
+package fetch
+
+import (
+	"slices"
+	"strconv"
+	"time"
+	"voxelprismatic/library-management-senior-project/common"
+)
 
 // https://developers.google.com/books/docs/v1/using
 
@@ -14,12 +21,16 @@ type GBooksVolDetails struct {
 
 type GBooksVolInfo struct {
 	Title               string              `json:"title"`
+	Subtitle            string              `json:"subtitle"`
 	Authors             []string            `json:"authors"`
 	Publisher           string              `json:"publisher"`
 	PublishedDate       string              `json:"publishedDate"`
 	Description         string              `json:"description"`
 	IndustryIdentifiers []GBooksIndustryIDs `json:"industryIdentifiers"`
+	ReadingModes        GBooksReadingModes  `json:"readingModes"`
 	PageCount           int                 `json:"pageCount"`
+	PrintedPageCount    int                 `json:"printedPageCount"`
+	MaturityRating      string              `json:"maturityRating"`
 	Dimensions          GBooksDimensions    `json:"dimensions"`
 	PrintType           string              `json:"printType"`
 	MainCategory        string              `json:"mainCategory"`
@@ -30,7 +41,13 @@ type GBooksVolInfo struct {
 	ImageLinks          GBooksImgLinks      `json:"imageLinks"`
 	Language            string              `json:"language"`
 	InfoLink            string              `json:"infoLink"`
+	PreviewLink         string              `json:"previewLink"`
 	CanonicalVolumeLink string              `json:"canonicalVolumeLink"`
+}
+
+type GBooksReadingModes struct {
+	Text  bool `json:"text"`
+	Image bool `json:"image"`
 }
 
 type GBooksIndustryIDs struct {
@@ -84,6 +101,49 @@ type GBooksFormatInfo struct {
 }
 
 type GBooksVolSearch struct {
-	Kind  string          `json:"kind"`
-	Items []GBooksVolInfo `json:"items"`
+	Kind       string             `json:"kind"`
+	TotalItems int                `json:"totalItems"`
+	Items      []GBooksVolDetails `json:"items"`
+}
+
+func (b GBooksVolDetails) ToLocalStruct() common.BookWork {
+	v := b.VolumeInfo
+	pubDate, _ := time.Parse("2006-01-02", v.PublishedDate)
+
+	var isbn10, isbn13 int64
+	var err error
+	for _, id := range v.IndustryIdentifiers {
+		switch id.Type {
+		case "ISBN_10":
+			isbn10, err = strconv.ParseInt(id.Identifier, 10, 64)
+		case "ISBN_13":
+			isbn13, err = strconv.ParseInt(id.Identifier, 10, 64)
+		}
+		if err != nil {
+			panic(err) // unreachable
+		}
+	}
+
+	categories := common.SqlStringList(v.Categories[:])
+	if v.MainCategory != "" && !slices.Contains(v.Categories, v.MainCategory) {
+		categories = append(categories, v.MainCategory)
+	}
+
+	return common.BookWork{
+		ID:            b.ID,
+		Title:         v.Title,
+		Subtitle:      v.Subtitle,
+		Authors:       common.SqlStringList(v.Authors),
+		Publisher:     v.Publisher,
+		PublishedDate: pubDate,
+		Version:       v.ContentVersion,
+		Isbn13:        isbn13,
+		Isbn10:        isbn10,
+		Description:   v.Description,
+		PageCount:     max(v.PageCount, v.PrintedPageCount),
+		IsMature:      v.MaturityRating == "MATURE",
+		Categories:    categories,
+		CoverThumb:    v.ImageLinks.Thumbnail,
+		CoverImage:    v.ImageLinks.Large,
+	}
 }

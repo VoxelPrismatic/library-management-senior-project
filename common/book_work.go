@@ -8,16 +8,19 @@ import (
 
 type BookWork struct {
 	gorm.Model
-	Isbn_13       int `gorm:"primaryKey"`
-	Isbn_10       int
-	GoogleBooksID string
-	OpenLibraryID string
-	WorldCatID    string
+	ID string `gorm:"primaryKey"` // Google Books Volume ID
+
 	Title         string
 	Authors       SqlStringList
-	Tags          SqlStringList
-	Published     time.Time
-	Language      string
-	PageCount     int
-	Description   string
+	Publisher     string
+	PublishedDate time.Time
+	Version       string
+
+	Isbn_13 int
+	Isbn_10 int
+
+	Description string
+	PageCount   int
+	IsMature    bool
+	Categories  SqlStringList
 }

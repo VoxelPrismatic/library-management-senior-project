@@ -14,7 +14,17 @@ type BookCopy struct {
 	Barcode   string
 	Condition ConditionFlag
 	Status    CopyStatusFlag
+	Format    BookFmtFlag
 }
+
+type BookFmtFlag int
+
+const (
+	BookFmtPhysicalBook  BookFmtFlag = 1 << iota
+	BookFmtPhysicalAudio             // E.g. a physical MP3 player with the book preloaded
+	BookFmtDigitalBook
+	BookFmtDigitalAudio
+)
 
 type ConditionFlag int
 
