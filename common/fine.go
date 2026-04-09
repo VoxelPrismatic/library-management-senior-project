@@ -8,11 +8,22 @@ import (
 
 type Fine struct {
 	gorm.Model
-	ID          int `gorm:"primaryKey"`
-	UserID      int
-	UserRef     User
-	LoanID      int
-	LoanRef     Loan
-	Amount      float32
-	PaymentDate time.Time
+	ID             int `gorm:"primaryKey"`
+	UserID         int
+	UserRef        User
+	LoanID         int
+	LoanRef        Loan
+	AmountAssessed float32
+	AmountPaid     float32
+	Status         FineStatus
+	LastPayment    time.Time
 }
+
+type FineStatus int
+
+const (
+	FineStatusUnpaid FineStatus = iota
+	FineStatusPartial
+	FineStatusPaid
+	FineStatusWaived
+)
