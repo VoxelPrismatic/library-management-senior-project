@@ -7,8 +7,26 @@ import (
 	"net/http"
 )
 
+var token string
+
+/*
+Search for books. Returns a "list" (google's search object is a list inside an object)
+
+Special search tags:
+ 1. `intitle:` Return results where the text following this word is found in the title.
+ 2. `inauthor:` …found in the author's name.
+ 3. `inpublisher:` …found in the publisher's name.
+ 4. `subject:` …found in the list of categories.
+ 5. `isbn:` Where the immediate next word matches the ISBN.
+ 6. `lccn:` …matches the Library of Congress Control number,
+ 7. `oclc:` …matches the Online Computer Library Center number.
+*/
 func GBooksSearch(search string) (*GBooksVolSearch, error) {
-	resp, err := http.Get("https://www.googleapis.com/books/v1/volumes?q=" + search)
+	uri := "https://www.googleapis.com/books/v1/volumes?q=" + search
+	if token != "" {
+		uri += "&key=" + token
+	}
+	resp, err := http.Get(uri)
 	if err != nil {
 		return nil, err
 	}
@@ -23,12 +41,18 @@ func GBooksSearch(search string) (*GBooksVolSearch, error) {
 	return ret, err
 }
 
+// Specifically an ISBN. Returns a single book.
 func GBooksIsbnLookup(isbn int) (*GBooksVolSearch, error) {
 	return GBooksSearch(fmt.Sprintf("isbn:%d", isbn))
 }
 
+// Google Books Volume ID
 func GBooksVolume(volume string) (*GBooksVolDetails, error) {
-	resp, err := http.Get("https://www.googleapis.com/books/v1/volumes/" + volume + "?projection=full")
+	uri := "https://www.googleapis.com/books/v1/volumes/" + volume + "?projection=full"
+	if token != "" {
+		uri += "&key=" + token
+	}
+	resp, err := http.Get(uri)
 	if err != nil {
 		return nil, err
 	}
@@ -37,9 +61,12 @@ func GBooksVolume(volume string) (*GBooksVolDetails, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(string(body))
 
 	ret := &GBooksVolDetails{}
 	err = json.Unmarshal(body, ret)
 	return ret, err
+}
+
+func SetAPIToken(newToken string) {
+	token = newToken
 }

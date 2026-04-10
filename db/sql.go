@@ -1,14 +1,16 @@
-package common
+package db
 
 import (
 	"database/sql/driver"
 	"fmt"
 	"strings"
+	"time"
 )
 
+// Gorm does not support arrays of strings, so this is our alternative
 type SqlStringList []string
 
-func (bstr *SqlStringList) Scan(value interface{}) error {
+func (bstr *SqlStringList) Scan(value any) error {
 	if value == nil {
 		*bstr = nil
 		return nil
@@ -29,3 +31,5 @@ func (bstr SqlStringList) Value() (driver.Value, error) {
 	}
 	return strings.Join(bstr, "\x98"), nil // 0x98 = Start of String
 }
+
+var NilTime = time.Time{}

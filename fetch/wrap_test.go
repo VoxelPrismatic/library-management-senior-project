@@ -3,6 +3,7 @@ package fetch
 import (
 	"fmt"
 	"testing"
+	"voxelprismatic/library-management-senior-project/web/book"
 )
 
 func TestLookup(t *testing.T) {
@@ -39,14 +40,14 @@ func TestLookup(t *testing.T) {
 }
 
 func TestVolume(t *testing.T) {
-	vol := "Bj6VEAAAQBAJ"
+	vol := book.GBooksVolumeID_t("Bj6VEAAAQBAJ")
 	data, err := GBooksVolume(vol)
 	if err != nil {
 		t.Errorf(`GBooksVolume(vol) unexpectedly returned error %v`, err)
 		return
 	}
 
-	if data.ID != vol {
+	if data.ID != string(vol) {
 		t.Errorf(`GBooksVolume(vol) expected "%s", got "%s"`, vol, data.ID)
 		return
 	}
