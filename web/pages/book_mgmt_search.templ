@@ -24,8 +24,9 @@ func gbooksMustSearch(q string) []book.BookWork {
 
 templ BookMgmtSearchFull(q string) {
 	@common.Head("search - "+q, "google books search")
-	<form hx-get="/management/books/search-grid"
-		hx-target="#search-grid">
+	<form hx-post="/management/books/add"
+		hx-target="#search-grid"
+		hx-swap="outerHTML">
 		<input name="q" type="text" value={ q }/>
 		<button type="submit">search</button>
 	</form>

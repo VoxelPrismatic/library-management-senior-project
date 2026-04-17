@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 	"voxelprismatic/library-management-senior-project/router/fail"
+	"voxelprismatic/library-management-senior-project/web/pages"
 )
 
 func Router(w http.ResponseWriter, r *http.Request) {
@@ -23,6 +24,7 @@ func Router(w http.ResponseWriter, r *http.Request) {
 		ManagementRouter(p)
 
 	case "":
+		fail.Render(p, pages.HomePage())
 	}
 }
 
