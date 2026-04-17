@@ -1,22 +1,65 @@
 package book
 
-import "strings"
 
-css book_thumb() {
-	display: flex;
-	flex-direction: row;
+css book_thumb_container() {
 	height: 256px;
 	width: 512px;
 	padding: 8px;
-	background-color: #ccc;
+	background-color: #eee;
+	border: 2px solid #000;
+	margin: 4px;
+	display: inline-block;
 }
 
-templ BookThumb(b BookWork) {
-	<div class={ book_thumb() } id={ b.ID }>
-		<img src={ b.CoverThumb }/>
-		<div>
-			<div>{ b.Title }</div>
-			<div style="font-size: smaller;">{ strings.Join(b.Authors, ", ") }</div>
+css book_thumb_flex() {
+	display: flex;
+	flex-direction: row;
+	height: 100%;
+}
+
+css book_thumb_img() {
+	height: 100%;
+	margin-right: 4px;
+}
+
+css book_thumb_tag() {
+	padding: 4px;
+	margin: 0px 4px 0px 0px;
+	background-color: #ddd;
+	border: 2px solid #888;
+	font-size: smaller;
+}
+
+templ BookThumb(b BookWork, variants ...BookWork) {
+	<div class={ book_thumb_container() } id={ b.ID }>
+		<div class={ book_thumb_flex() }>
+			<img src={ b.CoverThumb } class={ book_thumb_img() }/>
+			<div style="display: flex; flex-direction: column;">
+				<div>{ b.Title }</div>
+				<div style="font-size: smaller;">
+					{ "by " }
+					for i, author := range b.Authors {
+						<a href={ templ.SafeURL("?q=author:" + author) }>{author}</a>{
+						}if i < len(b.Authors)-1 {
+							<span>{", "}</span>
+						}
+					}
+				</div>
+				<div style="margin: 8px 0px">
+					for _, tag := range b.Tags() {
+						<span class={ book_thumb_tag() }>{ tag }</span>
+					}
+				</div>
+				<div style="overflow: scroll">{ b.Description }</div>
+				if len(variants) > 0 {
+					<select value={ b.ID }>
+						<option value={ b.ID }>{ b.Version }</option>
+						for _, v := range variants {
+							<option value={ v.ID }>{ v.Version }</option>
+						}
+					</select>
+				}
+			</div>
 		</div>
 	</div>
 }

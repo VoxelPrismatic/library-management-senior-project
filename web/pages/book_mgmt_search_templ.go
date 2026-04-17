@@ -15,19 +15,32 @@ import (
 	"voxelprismatic/library-management-senior-project/web/common"
 )
 
-func gbooksMustSearch(q string) []book.BookWork {
+func gbooksMustSearch(q string) book.BookVariants {
 	data, err := fetch.GBooksSearch(q)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println(data)
 
-	ret := make([]book.BookWork, len(data.Items))
-	for i, o := range data.Items {
-		ret[i] = o.ToLocalStruct()
+	ret := book.BookVariants{}
+	for _, o := range data.Items {
+		ret.Add(o.ToLocalStruct())
 		fmt.Println(o)
 	}
 	return ret
+}
+
+func center_width() templ.CSSClass {
+	templ_7745c5c3_CSSBuilder := templruntime.GetBuilder()
+	templ_7745c5c3_CSSBuilder.WriteString(`margin-left:auto;`)
+	templ_7745c5c3_CSSBuilder.WriteString(`margin-right:auto;`)
+	templ_7745c5c3_CSSBuilder.WriteString(`left:0px;`)
+	templ_7745c5c3_CSSBuilder.WriteString(`right:0px;`)
+	templ_7745c5c3_CSSID := templ.CSSID(`center_width`, templ_7745c5c3_CSSBuilder.String())
+	return templ.ComponentCSSClass{
+		ID:    templ_7745c5c3_CSSID,
+		Class: templ.SafeCSS(`.` + templ_7745c5c3_CSSID + `{` + templ_7745c5c3_CSSBuilder.String() + `}`),
+	}
 }
 
 func BookMgmtSearchFull(q string) templ.Component {
@@ -55,14 +68,14 @@ func BookMgmtSearchFull(q string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<form hx-get=\"/management/books/search-grid\" hx-target=\"#search-grid\"><input name=\"q\" type=\"text\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<form hx-post=\"/management/books/add\" hx-target=\"#search-grid\" hx-swap=\"outerHTML\"><input name=\"q\" type=\"text\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(q)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/pages/book_mgmt_search.templ`, Line: 29, Col: 39}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/pages/book_mgmt_search.templ`, Line: 37, Col: 39}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -105,10 +118,17 @@ func BookMgmtSearchGrid(q string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		for _, b := range gbooksMustSearch(q) {
-			templ_7745c5c3_Err = book.BookThumb(b).Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
+		for _, variants := range gbooksMustSearch(q) {
+			if len(variants) > 1 {
+				templ_7745c5c3_Err = book.BookThumb(variants[0], variants[1:]...).Render(ctx, templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			} else {
+				templ_7745c5c3_Err = book.BookThumb(variants[0]).Render(ctx, templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
 			}
 		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div>")

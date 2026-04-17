@@ -7,19 +7,26 @@ import (
 	"voxelprismatic/library-management-senior-project/web/common"
 )
 
-func gbooksMustSearch(q string) []book.BookWork {
+func gbooksMustSearch(q string) book.BookVariants {
 	data, err := fetch.GBooksSearch(q)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println(data)
 
-	ret := make([]book.BookWork, len(data.Items))
-	for i, o := range data.Items {
-		ret[i] = o.ToLocalStruct()
+	ret := book.BookVariants{}
+	for _, o := range data.Items {
+		ret.Add(o.ToLocalStruct())
 		fmt.Println(o)
 	}
 	return ret
+}
+
+css center_width() {
+	margin-left: auto;
+	margin-right: auto;
+	left: 0px;
+	right: 0px;
 }
 
 templ BookMgmtSearchFull(q string) {
@@ -35,8 +42,12 @@ templ BookMgmtSearchFull(q string) {
 
 templ BookMgmtSearchGrid(q string) {
 	<div id="search-grid">
-		for _, b := range gbooksMustSearch(q) {
-			@book.BookThumb(b)
+		for _, variants := range gbooksMustSearch(q) {
+			if len(variants) > 1 {
+				@book.BookThumb(variants[0], variants[1:]...)
+			} else {
+				@book.BookThumb(variants[0])
+			}
 		}
 	</div>
 }
