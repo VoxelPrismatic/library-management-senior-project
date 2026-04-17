@@ -22,8 +22,8 @@ type BookWork struct {
 	PublishedDate time.Time
 	Version       string // As provided by Google Books
 
-	Isbn13 int64
-	Isbn10 int64
+	Isbn13 string
+	Isbn10 string
 
 	Description string
 	PageCount   int

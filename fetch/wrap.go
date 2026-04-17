@@ -47,11 +47,6 @@ func GBooksSearch(search string) (*GBooksVolSearch, error) {
 	return ret, err
 }
 
-// Specifically an ISBN. Returns a single book.
-func GBooksIsbnLookup(isbn int) (*GBooksVolSearch, error) {
-	return GBooksSearch(fmt.Sprintf("isbn:%d", isbn))
-}
-
 // Google Books Volume ID
 func GBooksVolume(volume string) (*GBooksVolDetails, error) {
 	uri := "https://www.googleapis.com/books/v1/volumes/" + volume + "?projection=full"
