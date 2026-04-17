@@ -27,6 +27,19 @@ const (
 	UserRoleAdmin
 )
 
+func (f UserRoleFlag) String() string {
+	switch f {
+	case UserRolePublic:
+		return "public"
+	case UserRoleLibrarian:
+		return "librarian"
+	case UserRoleAdmin:
+		return "administrator"
+	default:
+		return "undefined"
+	}
+}
+
 type UserStatusFlag int
 
 const (
