@@ -2,7 +2,6 @@ package fetch
 
 import (
 	"slices"
-	"strconv"
 	"time"
 	"voxelprismatic/library-management-senior-project/db"
 	"voxelprismatic/library-management-senior-project/web/book"
@@ -111,17 +110,13 @@ func (b GBooksVolDetails) ToLocalStruct() book.BookWork {
 	v := b.VolumeInfo
 	pubDate, _ := time.Parse("2006-01-02", v.PublishedDate)
 
-	var isbn10, isbn13 int64
-	var err error
+	var isbn10, isbn13 string
 	for _, id := range v.IndustryIdentifiers {
 		switch id.Type {
 		case "ISBN_10":
-			isbn10, err = strconv.ParseInt(id.Identifier, 10, 64)
+			isbn10 = id.Identifier
 		case "ISBN_13":
-			isbn13, err = strconv.ParseInt(id.Identifier, 10, 64)
-		}
-		if err != nil {
-			panic(err) // unreachable
+			isbn13 = id.Identifier
 		}
 	}
 

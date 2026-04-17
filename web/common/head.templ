@@ -1,0 +1,14 @@
+package common
+
+templ Head(title string, desc string) {
+	<!DOCTYPE html>
+	<head>
+		<meta charset="utf-8"/>
+		<link rel="icon" href="/assets/favicon.ico"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<meta name="description" content={ desc }/>
+		<title>{ title }</title>
+		<script type="text/javascript" src="/assets/js/htmx-2.0.8.js"></script>
+	</head>
+}
+

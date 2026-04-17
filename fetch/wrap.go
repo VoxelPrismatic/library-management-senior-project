@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 )
 
 var token string
@@ -22,11 +23,12 @@ Special search tags:
  7. `oclc:` …matches the Online Computer Library Center number.
 */
 func GBooksSearch(search string) (*GBooksVolSearch, error) {
-	uri := "https://www.googleapis.com/books/v1/volumes?q=" + search
+	uri := "https://www.googleapis.com/books/v1/volumes?q=" + url.QueryEscape(search)
 	if token != "" {
 		uri += "&key=" + token
 	}
 	resp, err := http.Get(uri)
+	fmt.Println(uri)
 	if err != nil {
 		return nil, err
 	}
@@ -38,12 +40,11 @@ func GBooksSearch(search string) (*GBooksVolSearch, error) {
 
 	ret := &GBooksVolSearch{}
 	err = json.Unmarshal(body, ret)
+	if err != nil {
+		fmt.Printf("\x1b[91;1m%s\x1b[0m\n", uri)
+		fmt.Println(string(body))
+	}
 	return ret, err
-}
-
-// Specifically an ISBN. Returns a single book.
-func GBooksIsbnLookup(isbn int) (*GBooksVolSearch, error) {
-	return GBooksSearch(fmt.Sprintf("isbn:%d", isbn))
 }
 
 // Google Books Volume ID
@@ -69,4 +70,5 @@ func GBooksVolume(volume string) (*GBooksVolDetails, error) {
 
 func SetAPIToken(newToken string) {
 	token = newToken
+	fmt.Println("set token")
 }
