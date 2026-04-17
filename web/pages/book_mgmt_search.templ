@@ -1,0 +1,41 @@
+package pages
+
+import (
+	"fmt"
+	"voxelprismatic/library-management-senior-project/fetch"
+	"voxelprismatic/library-management-senior-project/web/book"
+	"voxelprismatic/library-management-senior-project/web/common"
+)
+
+func gbooksMustSearch(q string) []book.BookWork {
+	data, err := fetch.GBooksSearch(q)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(data)
+
+	ret := make([]book.BookWork, len(data.Items))
+	for i, o := range data.Items {
+		ret[i] = o.ToLocalStruct()
+		fmt.Println(o)
+	}
+	return ret
+}
+
+templ BookMgmtSearchFull(q string) {
+	@common.Head("search - "+q, "google books search")
+	<form hx-get="/management/books/search-grid"
+		hx-target="#search-grid">
+		<input name="q" type="text" value={ q }/>
+		<button type="submit">search</button>
+	</form>
+	@BookMgmtSearchGrid(q)
+}
+
+templ BookMgmtSearchGrid(q string) {
+	<div id="search-grid">
+		for _, b := range gbooksMustSearch(q) {
+			@book.BookThumb(b)
+		}
+	</div>
+}

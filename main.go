@@ -48,18 +48,28 @@ func main() {
 }
 
 func goRebuildUrself() {
-	cmd := exec.Command("templ", "generate", "-path", ".")
+	if code := goRunCommand("templ", "generate", "-path", "."); code != 0 {
+		os.Exit(code)
+	}
+
+	args := []string{"run", "main.go", "-templ-done"}
+	args = append(args, os.Args[1:]...)
+	fmt.Println(args)
+	if code := goRunCommand("go", args...); code != 0 {
+		os.Exit(code)
+	}
+}
+
+func goRunCommand(bin string, args ...string) int {
+	cmd := exec.Command(bin, args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
 		if exitErr, ok := errors.AsType[*exec.ExitError](err); ok {
-			os.Exit(exitErr.ExitCode())
+			return exitErr.ExitCode()
 		} else {
 			panic("unreachable")
 		}
 	}
-	args := []string{"run", "main.go", "-templ"}
-	args = append(args, os.Args...)
-	cmd = exec.Command("go", args...)
-	_ = cmd.Run()
+	return 0
 }

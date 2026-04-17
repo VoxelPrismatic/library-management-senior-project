@@ -1,0 +1,22 @@
+package book
+
+import "strings"
+
+css book_thumb() {
+	display: flex;
+	flex-direction: row;
+	height: 256px;
+	width: 512px;
+	padding: 8px;
+	background-color: #ccc;
+}
+
+templ BookThumb(b BookWork) {
+	<div class={ book_thumb() } id={ b.ID }>
+		<img src={ b.CoverThumb }/>
+		<div>
+			<div>{ b.Title }</div>
+			<div style="font-size: smaller;">{ strings.Join(b.Authors, ", ") }</div>
+		</div>
+	</div>
+}
