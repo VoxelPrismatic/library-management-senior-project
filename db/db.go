@@ -33,27 +33,6 @@ func Migrate(models ...any) bool {
 	return true
 }
 
-// Get the first object that matches the parameters of the filter object
-// The filter object is simply a partially filled struct
-// Note: This function returns a new object; it does not modify the object you pass
-func GetFirst[T any](filter T) T {
-	ret := new(T)
-	db.Where(&filter).First(ret)
-	return *ret
-}
-
-// Get many rows of data, with an optional sort.
-// If sort is an empty string, no sort is performed
-func GetMany[T any](filter T, sort string) []T {
-	ret := new([]T)
-	if sort != "" {
-		db.Where(&filter).Order(sort).Find(ret)
-	} else {
-		db.Where(&filter).Find(ret)
-	}
-	return *ret
-}
-
 // Retrieve a copy of the database pointer.
 func Db() *gorm.DB {
 	return db
