@@ -1,17 +1,9 @@
-package user
+package db
 
-import (
-	"voxelprismatic/library-management-senior-project/db"
-
-	"github.com/google/uuid"
-	"gorm.io/gorm"
-)
-
-var _ = db.Migrate(User{})
+var _ = Migrate(User{})
 
 type User struct {
-	gorm.Model
-	ID        uuid.UUID `gorm:"type:uuid;primaryKey"`
+	BaseModel
 	Roles     UserRoleFlag
 	FirstName string
 	LastName  string

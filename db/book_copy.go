@@ -1,19 +1,14 @@
-package book
+package db
 
 import (
 	"time"
-	"voxelprismatic/library-management-senior-project/db"
-
-	"github.com/google/uuid"
-	"gorm.io/gorm"
 )
 
-var _ = db.Migrate(BookCopy{}, RepairLog{})
+var _ = Migrate(BookCopy{}, RepairLog{})
 
 // An individual copy of a book
 type BookCopy struct {
-	gorm.Model
-	ID        uuid.UUID `gorm:"type:uuid;primaryKey"`
+	BaseModel
 	WorkID    string
 	Barcode   string        // TO-DO: Replace with deterministic function
 	Condition ConditionFlag // TO-DO: Replace with function to derive this based on last return and repair dates
@@ -23,9 +18,8 @@ type BookCopy struct {
 
 // Repair log for individual copies of a book for audit purposes
 type RepairLog struct {
-	gorm.Model
-	ID             uuid.UUID `gorm:"type:uuid;primaryKey"`
-	BookCopyID     uuid.UUID
+	BaseModel
+	BookCopyID     SqlUUID
 	Date           time.Time
 	IncomingStatus CopyStatusFlag
 	OutgoingStatus CopyStatusFlag

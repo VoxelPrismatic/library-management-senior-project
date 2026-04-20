@@ -1,22 +1,16 @@
-package loan
+package db
 
 import (
 	"time"
-
-	"voxelprismatic/library-management-senior-project/db"
-
-	"github.com/google/uuid"
-	"gorm.io/gorm"
 )
 
-var _ = db.Migrate(Hold{})
+var _ = Migrate(Hold{})
 
 // When a user wants to get in line to check out a book
 type Hold struct {
-	gorm.Model
-	ID          uuid.UUID `gorm:"type:uuid;primaryKey"`
-	WorkID      string
-	UserID      uuid.UUID
+	BaseModel
+	WorkID      SqlUUID
+	UserID      SqlUUID
 	RequestDate time.Time
 	Status      HoldStatus
 }

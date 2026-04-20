@@ -1,23 +1,19 @@
-package fine
+package db
 
 import (
 	"time"
 
-	"voxelprismatic/library-management-senior-project/db"
-
 	"github.com/google/uuid"
-	"gorm.io/gorm"
 )
 
-var _ = db.Migrate(Fine{})
+var _ = Migrate(Fine{})
 
 // A fine that must be paid before the user can check out more books.
 // A fine can be issued for any reason, including late, lost, or damaged.
 type Fine struct {
-	gorm.Model
-	ID     uuid.UUID `gorm:"type:uuid;primaryKey"`
-	UserID uuid.UUID
-	LoanID uuid.UUID
+	BaseModel
+	UserID SqlUUID
+	LoanID SqlUUID
 
 	IssueReason     FineReasonFlag
 	IssueDate       time.Time

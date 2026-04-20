@@ -1,25 +1,25 @@
-package book
+package db
 
 import (
 	"fmt"
 	"strings"
 	"time"
 
-	"voxelprismatic/library-management-senior-project/db"
-
 	"gorm.io/gorm"
 )
 
-var _ = db.Migrate(BookWork{})
+var _ = Migrate(BookWork{})
 
 // A literary work with all relevant metadata
 type BookWork struct {
+	// This struct intentionally does not inherit the BaseModel struct
+	// The ID here is supplied by Google, not our own UUID
 	gorm.Model
 	ID string `gorm:"primaryKey"` // Google Books Volume ID
 
-	Title         string           // E.g. A Woman Underground
-	Subtitle      string           // E.g. A Cameron Winter Mystery
-	Authors       db.SqlStringList `gorm:"type:text"`
+	Title         string        // E.g. A Woman Underground
+	Subtitle      string        // E.g. A Cameron Winter Mystery
+	Authors       SqlStringList `gorm:"type:text"`
 	Publisher     string
 	PublishedDate time.Time
 	Version       string // As provided by Google Books
@@ -30,7 +30,7 @@ type BookWork struct {
 	Description string
 	PageCount   int
 	IsMature    bool
-	Categories  db.SqlStringList `gorm:"type:text"`
+	Categories  SqlStringList `gorm:"type:text"`
 
 	CoverThumb string
 	CoverImage string
