@@ -114,3 +114,17 @@ func (b *BookWork) CopiesStrict() (CopyList, error) {
 	}).Find(&ret)
 	return ret, status.Error
 }
+
+// TO-DO: Fix available copies
+func (b *BookWork) AvailableCopies() int {
+	var activeCount int64
+	db.Model(&Checkout{}).
+		Where("book_isbn = ? AND returned_at = ?", b.ISBN, NilTime).
+		Count(&activeCount)
+
+	available := b.TotalCopies - int(activeCount)
+	if available < 0 {
+		return 0
+	}
+	return available
+}
