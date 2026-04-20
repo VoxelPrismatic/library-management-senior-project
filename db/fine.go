@@ -1,10 +1,6 @@
 package db
 
-import (
-	"time"
-
-	"github.com/google/uuid"
-)
+import "time"
 
 var _ = Migrate(Fine{})
 
@@ -12,8 +8,8 @@ var _ = Migrate(Fine{})
 // A fine can be issued for any reason, including late, lost, or damaged.
 type Fine struct {
 	BaseModel
-	UserID SqlUUID
-	LoanID SqlUUID
+	UserID SqlUUID `gorm:"type:text"`
+	LoanID SqlUUID `gorm:"type:text"`
 
 	IssueReason     FineReasonFlag
 	IssueDate       time.Time
@@ -22,7 +18,7 @@ type Fine struct {
 
 	AmountWaived  float32 // Any discounts provided by a librarian
 	WaivedReasion string
-	WaivedBy      uuid.UUID
+	WaivedBy      SqlUUID `gorm:"type:text"`
 }
 
 type FineReasonFlag int

@@ -10,31 +10,6 @@ import (
 	"gorm.io/gorm"
 )
 
-type SqlTime struct {
-	time.Time
-}
-
-func (btime *SqlTime) Scan(value any) error {
-	if value == nil {
-		*btime = SqlTime{}
-		return nil
-	}
-
-	str, ok := value.(string)
-	if !ok {
-		return fmt.Errorf("unable to convert %v of %T to string", value, value)
-	}
-
-	obj, err := time.Parse(time.ANSIC, str)
-	if err != nil {
-		return err
-	}
-
-	*btime = SqlTime{obj}
-	return nil
-
-}
-
 type SqlStringList []string
 
 func (bstr *SqlStringList) Scan(value any) error {

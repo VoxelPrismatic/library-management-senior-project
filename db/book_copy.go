@@ -1,8 +1,6 @@
 package db
 
-import (
-	"time"
-)
+import "time"
 
 var _ = Migrate(BookCopy{}, RepairLog{})
 
@@ -19,7 +17,7 @@ type BookCopy struct {
 // Repair log for individual copies of a book for audit purposes
 type RepairLog struct {
 	BaseModel
-	BookCopyID     SqlUUID
+	BookCopyID     SqlUUID `gorm:"type:text"`
 	Date           time.Time
 	IncomingStatus CopyStatusFlag
 	OutgoingStatus CopyStatusFlag

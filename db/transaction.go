@@ -1,8 +1,6 @@
 package db
 
-import (
-	"time"
-)
+import "time"
 
 var _ = Migrate(Transaction{})
 
@@ -14,7 +12,7 @@ var _ = Migrate(Transaction{})
  */
 type Transaction struct {
 	BaseModel
-	UserID     SqlUUID
+	UserID     SqlUUID `gorm:"type:text"`
 	AmountPaid float32
 	Date       time.Time
 }

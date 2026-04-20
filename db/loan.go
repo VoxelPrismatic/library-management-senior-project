@@ -17,10 +17,10 @@ var _ = Migrate(Loan{})
 // marked as returned and a new loan should be issued.
 type Loan struct {
 	BaseModel
-	BookCopyID        SqlUUID
-	UserID            SqlUUID
+	BookCopyID        SqlUUID `gorm:"type:text"`
+	UserID            SqlUUID `gorm:"type:text"`
 	DateCheckout      time.Time
-	DateReturned      *time.Time
+	DateReturned      time.Time
 	OutgoingCondition ConditionFlag
 	IncomingCondition ConditionFlag
 }
