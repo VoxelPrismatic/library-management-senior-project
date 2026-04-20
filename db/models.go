@@ -23,8 +23,12 @@ type Book struct {
 
 // Returns how many copies are currently available to borrow
 func (b *Book) AvailableCopies() int {
-	active := GetMany(Checkout{BookISBN: b.ISBN, ReturnedAt: NilTime}, "")
-	available := b.TotalCopies - len(active)
+	var activeCount int64
+	db.Model(&Checkout{}).
+		Where("book_isbn = ? AND returned_at = ?", b.ISBN, NilTime).
+		Count(&activeCount)
+
+	available := b.TotalCopies - int(activeCount)
 	if available < 0 {
 		return 0
 	}
