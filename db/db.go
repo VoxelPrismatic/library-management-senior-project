@@ -1,7 +1,6 @@
 package db
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
 
@@ -60,20 +59,9 @@ func Db() *gorm.DB {
 	return db
 }
 
-// Save the object into the database.
-// Gorm automatically figures out the table to put it in, so you call it as `db.Save(obj)`
-// Note: This function automatically creates OR updates an object
-func Save(model any) error {
-	result := db.Create(model)
-	if errors.Is(result.Error, gorm.ErrDuplicatedKey) {
-		result = db.Model(model).Updates(model)
-	}
-	return result.Error
-}
-
-// Like Save(model), but will panic if an error is returned
-func MustSave(model any) {
-	if err := Save(model); err != nil {
-		panic(err)
+func MustSave(obj any) {
+	state := db.Save(obj)
+	if state.Error != nil {
+		panic(state.Error)
 	}
 }
