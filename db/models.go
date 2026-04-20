@@ -45,7 +45,7 @@ type Checkout struct {
 }
 
 func (c *Checkout) IsActive() bool {
-	return c.ReturnedAt == NilTime
+	return c.ReturnedAt.IsZero()
 }
 
 func (c *Checkout) IsOverdue() bool {
