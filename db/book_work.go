@@ -84,3 +84,36 @@ func (v *BookVariants) Add(b BookWork) {
 	}
 	(*v)[id] = []BookWork{b}
 }
+
+// Gets all the editions matching this title and author
+func (b *BookWork) Editions() ([]BookWork, error) {
+	ret := []BookWork{}
+	status := db.Model(b).Where(&BookWork{
+		Title:   b.Title,
+		Authors: b.Authors,
+	}).Find(&ret)
+	return ret, status.Error
+}
+
+// Lists all copies from all editions
+func (b *BookWork) AllCopies() (CopyList, error) {
+	ret := []BookCopy{}
+	status := db.Model(&BookCopy{}).
+		Joins("JOINS book_works ON work_id = book_works.id").
+		Where(&BookWork{
+			Title:   b.Title,
+			Authors: b.Authors,
+		}).
+		Find(&ret)
+
+	return ret, status.Error
+}
+
+// Strictly matches against this particular edition
+func (b *BookWork) CopiesStrict() (CopyList, error) {
+	ret := []BookCopy{}
+	status := db.Model(&BookCopy{}).Where(&BookCopy{
+		BookWorkID: b.ID,
+	}).Find(&ret)
+	return ret, status.Error
+}
