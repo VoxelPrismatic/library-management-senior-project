@@ -7,11 +7,12 @@ var _ = Migrate(BookCopy{}, RepairLog{})
 // An individual copy of a book
 type BookCopy struct {
 	BaseModel
-	WorkID    string
-	Barcode   string        // TO-DO: Replace with deterministic function
-	Condition ConditionFlag // TO-DO: Replace with function to derive this based on last return and repair dates
-	Format    BookFmtFlag   // Hard-cover, paperback, etc.
-	Status    CopyStatusFlag
+	BookWork   BookWork
+	BookWorkID string
+	Barcode    string        // TO-DO: Replace with deterministic function
+	Condition  ConditionFlag // TO-DO: Replace with function to derive this based on last return and repair dates
+	Format     BookFmtFlag   // Hard-cover, paperback, etc.
+	Status     CopyStatusFlag
 }
 
 // Repair log for individual copies of a book for audit purposes
@@ -53,3 +54,59 @@ const (
 	CopyStatusRepairing                           // Book is being repaired (rebound, etc.)
 	CopyStatusDiscarded                           // Book is discarded, possibly replaced
 )
+
+type CopyLoanFlag int
+
+const (
+	CopyLoanAvailable  CopyLoanFlag = 1 << iota // Open to the public
+	CopyLoanUnvailable                          // Book is checked out
+	CopyLoanOverdue                             // Book is checked out and overdue
+	CopyLoanWithdrawn                           // Book is withdrawn from circulation until repairs are complete
+)
+
+type FormatsMap map[BookFmtFlag][]BookCopy
+type CopyList []BookCopy
+
+func (arr CopyList) MapFormats() FormatsMap {
+	ret := FormatsMap{}
+	for _, e := range arr {
+		_, exists := ret[e.Format]
+		if !exists {
+			ret[e.Format] = []BookCopy{e}
+		} else {
+			ret[e.Format] = append(ret[e.Format], e)
+		}
+
+	}
+	return ret
+}
+
+func (c BookCopy) LoanHistory() ([]Loan, error) {
+	ret := []Loan{}
+	status := db.Preload("users").
+		Preload("book_copies").
+		Model(&Loan{}).
+		Where(&Loan{
+			BookCopyID: c.ID,
+		}).
+		Order("date_checkout DESC").
+		Find(&ret)
+	return ret, status.Error
+}
+
+func (c BookCopy) LoanStatus() (CopyLoanFlag, error) {
+	if c.Status != CopyStatusPublic {
+		return CopyLoanWithdrawn, nil
+	}
+
+	history, err := c.LoanHistory()
+	if err != nil {
+		return CopyLoanWithdrawn, err
+	}
+
+	if len(history) == 0 {
+		return CopyLoanAvailable, nil
+	}
+
+	return history[0].Status().ToCopyStatus(), nil
+}
