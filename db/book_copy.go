@@ -64,15 +64,15 @@ const (
 	CopyLoanWithdrawn                           // Book is withdrawn from circulation until repairs are complete
 )
 
-type FormatsMap map[BookFmtFlag][]BookCopy
+type FormatsMap[T any] map[BookFmtFlag]T
 type CopyList []BookCopy
 
-func (arr CopyList) MapFormats() FormatsMap {
-	ret := FormatsMap{}
+func (arr CopyList) MapFormats() FormatsMap[CopyList] {
+	ret := FormatsMap[CopyList]{}
 	for _, e := range arr {
 		_, exists := ret[e.Format]
 		if !exists {
-			ret[e.Format] = []BookCopy{e}
+			ret[e.Format] = CopyList{e}
 		} else {
 			ret[e.Format] = append(ret[e.Format], e)
 		}
