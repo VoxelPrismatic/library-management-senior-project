@@ -155,7 +155,7 @@ func (b *BookWork) AvailableCopies(strict bool) (FormatsMap[CopyCount], error) {
 		return nil, err
 	}
 
-	checkedOutSubquery := db.Table("loands l").
+	checkedOutSubquery := db.Table("loans l").
 		Select("1").
 		Where("l.book_copy_id = book_copies.id").
 		Where("l.date_returned = ?", NilTime)
@@ -164,7 +164,7 @@ func (b *BookWork) AvailableCopies(strict bool) (FormatsMap[CopyCount], error) {
 	err = db.Model(&BookCopy{}).
 		Where("status = ?", CopyStatusPublic).
 		Where("book_work_id IN ?", ids).
-		Where("NOT EXISTS ?", checkedOutSubquery).
+		Where("NOT EXISTS (?)", checkedOutSubquery).
 		Group("format").
 		Select("format, COUNT(*) as count").
 		Scan(&availableCounts).Error
