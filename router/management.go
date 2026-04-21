@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"voxelprismatic/library-management-senior-project/db"
 	"voxelprismatic/library-management-senior-project/router/fail"
 	"voxelprismatic/library-management-senior-project/web/pages"
-	"voxelprismatic/library-management-senior-project/web/user"
 )
 
 func ManagementRouter(p *fail.RoutingParams) {
-	if fail.Auth(p, user.UserRoleLibrarian) {
+	if fail.Auth(p, db.UserRoleLibrarian) {
 		return
 	}
 
@@ -23,7 +23,7 @@ func ManagementRouter(p *fail.RoutingParams) {
 }
 
 func ManagementBooksRouter(p *fail.RoutingParams) {
-	if fail.Auth(p, user.UserRoleLibrarian) {
+	if fail.Auth(p, db.UserRoleLibrarian) {
 		return
 	}
 

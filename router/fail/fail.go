@@ -2,7 +2,7 @@ package fail
 
 import (
 	"net/http"
-	"voxelprismatic/library-management-senior-project/web/user"
+	"voxelprismatic/library-management-senior-project/db"
 
 	"github.com/a-h/templ"
 )
@@ -28,7 +28,7 @@ func Form(p *RoutingParams) bool {
 
 // Returns 'true' if the user does NOT meet the minimum role requirements
 // Usage: `if fail.Auth(p, UserRoleLibrarian) { return }`
-func Auth(p *RoutingParams, minLevel user.UserRoleFlag) bool {
+func Auth(p *RoutingParams, minLevel db.UserRoleFlag) bool {
 	if minLevel <= p.User.Roles {
 		return false
 	}
