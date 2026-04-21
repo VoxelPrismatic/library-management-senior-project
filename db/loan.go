@@ -49,13 +49,6 @@ func (s LoanStatusFlag) ToCopyStatus() CopyLoanFlag {
 	}
 }
 
-func (l Loan) Overdue() bool {
-	if l.DateReturned.IsZero() {
-		return false
-	}
-	return l.DateCheckout.Add(LOAN_DURATION).After(time.Now())
-}
-
 func (l Loan) Status() LoanStatusFlag {
 	if !l.DateReturned.IsZero() {
 		return LoanStatusReturned
