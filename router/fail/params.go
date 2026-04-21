@@ -3,8 +3,7 @@ package fail
 import (
 	"net/http"
 	"strings"
-	"voxelprismatic/library-management-senior-project/web/common"
-	"voxelprismatic/library-management-senior-project/web/user"
+	"voxelprismatic/library-management-senior-project/db"
 )
 
 type RoutingParams struct {
@@ -12,7 +11,7 @@ type RoutingParams struct {
 	Req      *http.Request
 	SubPtr   int
 	FullPath []string
-	User     *user.User
+	User     *db.User
 }
 
 func (p *RoutingParams) Pop() string {
@@ -26,7 +25,7 @@ func (p *RoutingParams) Pop() string {
 }
 
 func MakeParams(writer http.ResponseWriter, request *http.Request) *RoutingParams {
-	u := common.CookieAuth(writer, request)
+	u := db.CookieAuth(writer, request)
 	p := strings.Split(request.URL.Path[len("/"):], "/")
 	ret := RoutingParams{
 		W:        writer,

@@ -10,19 +10,20 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	"fmt"
+	"voxelprismatic/library-management-senior-project/db"
 	"voxelprismatic/library-management-senior-project/fetch"
 	"voxelprismatic/library-management-senior-project/web/book"
 	"voxelprismatic/library-management-senior-project/web/common"
 )
 
-func gbooksMustSearch(q string) book.BookVariants {
+func gbooksMustSearch(q string) db.BookVariants {
 	data, err := fetch.GBooksSearch(q)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println(data)
 
-	ret := book.BookVariants{}
+	ret := db.BookVariants{}
 	for _, o := range data.Items {
 		ret.Add(o.ToLocalStruct())
 		fmt.Println(o)
@@ -75,7 +76,7 @@ func BookMgmtSearchFull(q string) templ.Component {
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(q)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/pages/book_mgmt_search.templ`, Line: 37, Col: 39}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/pages/book_mgmt_search.templ`, Line: 38, Col: 39}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {

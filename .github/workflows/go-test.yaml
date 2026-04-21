@@ -1,0 +1,28 @@
+name: Go Test
+
+on:
+    pull_request:
+        types: [opened, synchronize, reopened, ready_for_review]
+
+jobs:
+    test:
+        name: Run Tests
+        runs-on: ubuntu-latest
+
+        # Only run on non-draft PRs (skips drafts and also works when a draft is marked "ready for review")
+        if: github.event.pull_request.draft == false
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Set up Go
+              uses: actions/setup-go@v5
+              with:
+                  # Reads the exact Go version from your go.mod (no hard-coding needed)
+                  go-version-file: go.mod
+                  # Enables Go module caching automatically
+                  cache: true
+
+            - name: Run tests
+              run: make test-db

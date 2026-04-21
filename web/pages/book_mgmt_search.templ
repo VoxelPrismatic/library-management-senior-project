@@ -3,18 +3,19 @@ package pages
 import (
 	"fmt"
 	"voxelprismatic/library-management-senior-project/fetch"
+	"voxelprismatic/library-management-senior-project/db"
 	"voxelprismatic/library-management-senior-project/web/book"
 	"voxelprismatic/library-management-senior-project/web/common"
 )
 
-func gbooksMustSearch(q string) book.BookVariants {
+func gbooksMustSearch(q string) db.BookVariants {
 	data, err := fetch.GBooksSearch(q)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println(data)
 
-	ret := book.BookVariants{}
+	ret := db.BookVariants{}
 	for _, o := range data.Items {
 		ret.Add(o.ToLocalStruct())
 		fmt.Println(o)

@@ -4,7 +4,6 @@ import (
 	"slices"
 	"time"
 	"voxelprismatic/library-management-senior-project/db"
-	"voxelprismatic/library-management-senior-project/web/book"
 )
 
 // https://developers.google.com/books/docs/v1/using
@@ -106,7 +105,7 @@ type GBooksVolSearch struct {
 	Items      []GBooksVolDetails `json:"items"`
 }
 
-func (b GBooksVolDetails) ToLocalStruct() book.BookWork {
+func (b GBooksVolDetails) ToLocalStruct() db.BookWork {
 	v := b.VolumeInfo
 	pubDate, _ := time.Parse("2006-01-02", v.PublishedDate)
 
@@ -125,7 +124,7 @@ func (b GBooksVolDetails) ToLocalStruct() book.BookWork {
 		categories = append(categories, v.MainCategory)
 	}
 
-	return book.BookWork{
+	return db.BookWork{
 		ID:            b.ID,
 		Title:         v.Title,
 		Subtitle:      v.Subtitle,

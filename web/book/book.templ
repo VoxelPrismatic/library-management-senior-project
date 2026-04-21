@@ -1,5 +1,9 @@
 package book
 
+import (
+	"voxelprismatic/library-management-senior-project/db"
+)
+
 
 css book_thumb_container() {
 	height: 256px;
@@ -30,7 +34,7 @@ css book_thumb_tag() {
 	font-size: smaller;
 }
 
-templ BookThumb(b BookWork, variants ...BookWork) {
+templ BookThumb(b db.BookWork, variants ...db.BookWork) {
 	<div class={ book_thumb_container() } id={ b.ID }>
 		<div class={ book_thumb_flex() }>
 			<img src={ b.CoverThumb } class={ book_thumb_img() }/>
