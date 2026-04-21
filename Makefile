@@ -4,3 +4,6 @@ run: templ
 
 templ:
 	templ generate -path .
+
+test: templ
+	go test ./db ./fetch
