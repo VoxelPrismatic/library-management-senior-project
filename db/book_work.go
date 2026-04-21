@@ -116,15 +116,25 @@ func (b *BookWork) CopiesStrict() (CopyList, error) {
 }
 
 // TO-DO: Fix available copies
-func (b *BookWork) AvailableCopies() int {
-	var activeCount int64
-	db.Model(&Checkout{}).
-		Where("book_isbn = ? AND returned_at = ?", b.ISBN, NilTime).
-		Count(&activeCount)
 
-	available := b.TotalCopies - int(activeCount)
-	if available < 0 {
-		return 0
+
+type CopyCount struct {
+	Total     int
+	Available int
+}
+
+type FormatMap map[string]CopyCount
+
+func (b *BookWork) AvailableCopies() FormatMap {
+	copies, _ := b.CopiesStrict()
+	result := FormatMap{}
+	for _, c := range copies {
+		counts := result[string(c.Format)]
+		counts.Total++
+		if c.Status == CopyStatusPublic {
+			counts.Available++
+		}
+		result[string(c.Format)] = counts
 	}
-	return available
+	return result
 }
