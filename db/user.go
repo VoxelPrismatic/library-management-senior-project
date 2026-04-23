@@ -1,6 +1,10 @@
 package db
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 var _ = Migrate(User{})
 
@@ -10,6 +14,7 @@ type User struct {
 	FirstName string
 	LastName  string
 	Email     string
+	Secret    string
 	Status    UserStatusFlag
 }
 
@@ -59,4 +64,38 @@ func (u User) HasOverdueBooks() (bool, error) {
 		"date_checkout < ?", time.Now().Add(-LOAN_DURATION),
 	).Count(&count)
 	return count == 0, status.Error
+}
+
+func (u User) Partial() UserPartial {
+	return UserPartial{
+		ID:        u.ID.String(),
+		Roles:     u.Roles,
+		FirstName: u.FirstName,
+		LastName:  u.LastName,
+	}
+}
+
+type UserPartial struct {
+	ID        string
+	Roles     UserRoleFlag
+	FirstName string
+	LastName  string
+	IssuedAt  int64 `json:"iat"`
+	ExpiresAt int64 `json:"exp"`
+}
+
+func (p UserPartial) Fetch() (User, error) {
+	id, err := uuid.Parse(p.ID)
+	if err != nil {
+		return User{}, err
+	}
+
+	ret := User{BaseModel: BaseModel{ID: SqlUUID{id}}}
+	err = db.Where(&ret).First(&ret).Error
+	return ret, err
+}
+
+func (p *UserPartial) SetTimestamp(t int64) {
+	p.IssuedAt = t
+	p.ExpiresAt = t + JWT_LIFETIME
 }
