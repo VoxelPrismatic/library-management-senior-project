@@ -6,56 +6,83 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
 )
 
-const JWT_LIFETIME = int64(WEEK/time.Second) * 4 // One month login time
+const JWT_LIFETIME_MS = WEEK * 4 // One month login time
+const JWT_LIFETIME = int64(JWT_LIFETIME_MS / time.Second)
 const JWT_SECRET = "The Super Duper Secret Hash that should be stored elsewhere:tm:"
 
 var JWT_ENC = base64.RawURLEncoding
 
-func CookieAuth(w http.ResponseWriter, r *http.Request) UserPartial {
+func CookieAuth(w http.ResponseWriter, r *http.Request) *UserPartial {
 	cookie, err := r.Cookie("tok")
 	if err != nil {
 		w.Header().Set("X-Auth-Stage", "cookie.get")
 		w.Header().Set("X-Auth-Reason", err.Error())
-		return UserPartial{}
+		return nil
 	}
 
-	data, stage, err := ValidateJWT(cookie.String())
+	data, stage, err := ValidateJWT(cookie.Value)
 	if err != nil {
 		w.Header().Set("X-Auth-Stage", stage)
 		w.Header().Set("X-Auth-Reason", err.Error())
-		return UserPartial{}
+		return nil
 	}
 
 	if data == nil {
 		w.Header().Set("X-Auth-Stage", "auth.return")
 		w.Header().Set("X-Auth-Reason", "nil")
-		return UserPartial{}
+		return nil
 	}
 
-	return *data
+	// TO-DO: Delete this after testing
+	w.Header().Set("X-User-ID", data.ID)
+
+	return data
 }
 
-func (u *User) NewJWT() string {
+var _ = Migrate(JwtEntry{})
+
+type JwtEntry struct {
+	BaseModel
+	Token     string
+	User      User
+	UserID    SqlUUID
+	ExpiresAt time.Time
+}
+
+func (u *User) IssueJWT() JwtEntry {
+	fmt.Println("\x1b[94;1mPre-JWT\x1b[0m")
+	db.Save(&u)
 	header := ToJsonB64(map[string]string{
 		"alg": "HS256",
 		"typ": "JWT",
 	})
 
-	issuedAt := time.Now().Unix()
+	issuedAt := time.Now()
 	partial := u.Partial()
-	partial.SetTimestamp(issuedAt)
+	partial.SetTimestamp(issuedAt.Unix())
 	claims := ToJsonB64(partial)
 
-	unsignedToken := header + "." + claims
+	token := header + "." + claims
 	sig := hmac.New(sha256.New, []byte(JWT_SECRET))
-	sig.Write([]byte(unsignedToken))
+	sig.Write([]byte(token))
 	sum := JWT_ENC.EncodeToString(sig.Sum(nil))
-	return unsignedToken + "." + sum
+	token += "." + sum
+
+	ret := JwtEntry{
+		Token:     token,
+		UserID:    u.ID,
+		ExpiresAt: issuedAt.Add(JWT_LIFETIME_MS),
+	}
+
+	fmt.Println("\x1b[94;1mPost-JWT\x1b[0m")
+	db.Save(&ret)
+	return ret
 }
 
 func ToJsonB64(dataMap any) string {

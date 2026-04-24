@@ -43,3 +43,19 @@ func Redirect(p *RoutingParams) {
 	p.W.Header().Set("X-Redirect-Reason", "404: "+p.SubPathTree(true))
 	http.Redirect(p.W, p.Req, p.SubPathTree(false), http.StatusPermanentRedirect)
 }
+
+// Fails if the path is not fully consumed
+func Done(p *RoutingParams) bool {
+	if p.SubPtr >= len(p.FullPath) {
+		return false
+	}
+
+	// Ending /, but nothing nefarious
+	if p.SubPtr == len(p.FullPath)-1 && p.FullPath[p.SubPtr] == "" {
+		Redirect(p)
+		return true
+	}
+
+	_, _ = p.W.Write([]byte("404: too far"))
+	return true
+}

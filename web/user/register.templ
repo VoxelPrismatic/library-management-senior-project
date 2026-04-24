@@ -1,0 +1,42 @@
+package user
+
+import (
+	"voxelprismatic/library-management-senior-project/web/common"
+)
+
+templ (e FormEntry) TableRow(vals map[string]string, errs map[string]error) {
+	<tr id={e.ID}>
+		<th style="text-align: right">
+			<label for={e.ID}>{e.Label}</label>
+		</th>
+		<td>
+			<input name={e.ID}
+				type={e.Type}
+				placeholder={e.Ghost}
+				title={e.Label}
+				value={vals[e.ID]}/>
+		</td>
+		<td>
+			if err := errs[e.ID]; err != nil {
+				<span style="color: red;">{err.Error()}</span>
+			}
+		</td>
+	</tr>
+}
+
+
+templ FormTable(vals map[string]string, errs map[string]error) {
+	<table id="formEntry">
+		for _, entry := range RegisterFormEntries {
+			@entry.TableRow(vals, errs)
+		}
+	</table>
+}
+
+templ Register() {
+	@common.Head("register user", "register user")
+	<form hx-post="/user/register">
+		@FormTable(map[string]string{}, map[string]error{})
+		<button type="submit">Submit</button>
+	</form>
+}
