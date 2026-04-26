@@ -1,6 +1,8 @@
 package db
 
-import "time"
+import (
+	"time"
+)
 
 var _ = Migrate(Hold{})
 
@@ -16,17 +18,7 @@ type Hold struct {
 	CancelledDate time.Time
 }
 
-type HoldStatus int
-
-const (
-	HoldQueued    HoldStatus = 1 << iota // User in queue
-	HoldCancelled                        // User canceled hold
-	HoldPostponed                        // User have outstanding charges and cannot check out books right now
-	HoldCompleted                        // User has checked out the book
-	HoldRevoked                          // User account has been deleted
-)
-
-func (h Hold) Status() (HoldStatus, error) {
+func (h Hold) Status() (HoldStatusFlag, error) {
 	if !h.FulfilledDate.IsZero() {
 		return HoldCompleted, nil
 	}
@@ -56,6 +48,7 @@ func (h Hold) Status() (HoldStatus, error) {
 }
 
 func (h Hold) GetUser() User {
+	db := Db()
 	if h.User.ID.IsEmpty() {
 		db.Where(&User{BaseModel: BaseModel{ID: h.UserID}}).First(&h.User)
 	}

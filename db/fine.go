@@ -20,11 +20,3 @@ type Fine struct {
 	WaivedReasion string
 	WaivedBy      SqlUUID `gorm:"type:text"`
 }
-
-type FineReasonFlag int
-
-const (
-	FineReasonLate    FineReasonFlag = iota // Did not return the book on time
-	FineReasonLost                          // Lost the book; fee for replacement
-	FineReasonDamaged                       // Book was received damaged, eg torn pages
-)

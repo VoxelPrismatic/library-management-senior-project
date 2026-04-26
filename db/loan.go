@@ -28,14 +28,6 @@ type Loan struct {
 	IncomingCondition ConditionFlag
 }
 
-type LoanStatusFlag int
-
-const (
-	LoanStatusReturned LoanStatusFlag = 1 << iota
-	LoanStatusCheckedOut
-	LoanStatusOverdue
-)
-
 func (s LoanStatusFlag) ToCopyStatus() CopyLoanFlag {
 	switch s {
 	case LoanStatusReturned:
@@ -53,7 +45,7 @@ func (l Loan) Status() LoanStatusFlag {
 	if !l.DateReturned.IsZero() {
 		return LoanStatusReturned
 	}
-	if l.DateReturned.Add(LOAN_DURATION).Before(time.Now()) {
+	if l.DateCheckout.Add(LOAN_DURATION).Before(time.Now()) {
 		return LoanStatusOverdue
 	}
 	return LoanStatusCheckedOut
@@ -61,6 +53,7 @@ func (l Loan) Status() LoanStatusFlag {
 
 // Marks a book as returned
 func (c *Loan) Return() error {
+	db := Db()
 	c.DateReturned = time.Now()
 	return db.Save(c).Error
 }
