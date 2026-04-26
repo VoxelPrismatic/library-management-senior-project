@@ -44,19 +44,22 @@ const (
 )
 
 func (u User) CheckedOut() ([]Loan, error) {
+	db := Db()
 	ret := []Loan{}
-	status := db.Model(&Loan{}).Joins("users").Where(
-		"date_returned = ?", NilTime,
-	).Find(&ret)
+	status := db.Preload("users").Model(&Loan{}).
+		Where("user_id = ?", u.ID).
+		Where("date_returned = ?", nil).
+		Find(&ret)
 	return ret, status.Error
 }
 
 func (u User) HasOverdueBooks() (bool, error) {
+	db := Db()
 	count := int64(0)
-	status := db.Model(&Loan{}).Joins("users").Where(
-		"date_returned = ?", NilTime,
-	).Where(
-		"date_checkout < ?", time.Now().Add(-LOAN_DURATION),
-	).Count(&count)
+	status := db.Preload("users").Model(&Loan{}).
+		Where("user_id = ?", u.ID).
+		Where("date_returned = ?", nil).
+		Where("date_checkout < ?", time.Now().Add(-LOAN_DURATION)).
+		Count(&count)
 	return count == 0, status.Error
 }

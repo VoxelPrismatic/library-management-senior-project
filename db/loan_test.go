@@ -18,9 +18,6 @@ func TestLoanFlags(t *testing.T) {
 }
 
 func TestLoanStatusCheckedOut(t *testing.T) {
-	tx := db.Begin()
-	defer tx.Rollback()
-
 	loan := Loan{
 		DateCheckout: time.Now().Add(-DAY),
 		DateReturned: NilTime,
@@ -32,9 +29,6 @@ func TestLoanStatusCheckedOut(t *testing.T) {
 }
 
 func TestLoanStatusOverdue(t *testing.T) {
-	tx := db.Begin()
-	defer tx.Rollback()
-
 	loan := Loan{
 		DateCheckout: time.Now().Add(-LOAN_DURATION * 2),
 		DateReturned: NilTime,
@@ -46,9 +40,6 @@ func TestLoanStatusOverdue(t *testing.T) {
 }
 
 func TestLoanStatusReturned(t *testing.T) {
-	tx := db.Begin()
-	defer tx.Rollback()
-
 	loan := Loan{
 		DateCheckout: time.Now().Add(-WEEK),
 		DateReturned: time.Now(),
@@ -60,7 +51,7 @@ func TestLoanStatusReturned(t *testing.T) {
 }
 
 func TestLoanReturn(t *testing.T) {
-	tx := db.Begin()
+	tx := TestDb()
 	defer tx.Rollback()
 
 	user := User{
@@ -68,20 +59,20 @@ func TestLoanReturn(t *testing.T) {
 		LastName:  "User",
 		Email:     "test@example.com",
 	}
-	db.Save(&user)
+	tx.Save(&user)
 
 	book := BookWork{
 		ID:    "test-book-id",
 		Title: "Test Book",
 	}
-	db.Save(&book)
+	tx.Save(&book)
 
 	copy := BookCopy{
 		BookWorkID: book.ID,
 		Format:     BookFmtPaperback,
 		Status:     CopyStatusPublic,
 	}
-	db.Save(&copy)
+	tx.Save(&copy)
 
 	loan := Loan{
 		BookCopyID:   copy.ID,
@@ -89,7 +80,7 @@ func TestLoanReturn(t *testing.T) {
 		DateCheckout: time.Now().Add(-DAY),
 		DateReturned: NilTime,
 	}
-	db.Save(&loan)
+	tx.Save(&loan)
 
 	err := loan.Return()
 	if err != nil {

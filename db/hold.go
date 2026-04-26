@@ -56,6 +56,7 @@ func (h Hold) Status() (HoldStatus, error) {
 }
 
 func (h Hold) GetUser() User {
+	db := Db()
 	if h.User.ID.IsEmpty() {
 		db.Where(&User{BaseModel: BaseModel{ID: h.UserID}}).First(&h.User)
 	}

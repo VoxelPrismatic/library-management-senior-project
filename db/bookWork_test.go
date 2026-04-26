@@ -5,14 +5,14 @@ import (
 )
 
 func TestAvailableCopiesTotal(t *testing.T) {
-	tx := db.Begin()
+	tx := TestDb()
 	defer tx.Rollback()
 
 	book := BookWork{
 		ID:    "test-book-id",
 		Title: "Test Book",
 	}
-	db.Save(&book)
+	tx.Save(&book)
 
 	copy1 := BookCopy{
 		BookWorkID: book.ID,
@@ -24,8 +24,8 @@ func TestAvailableCopiesTotal(t *testing.T) {
 		Format:     BookFmtPaperback,
 		Status:     CopyStatusPublic,
 	}
-	db.Save(&copy1)
-	db.Save(&copy2)
+	tx.Save(&copy1)
+	tx.Save(&copy2)
 
 	counts, err := book.AvailableCopies(true)
 	if err != nil {
@@ -45,7 +45,7 @@ func TestAvailableCopiesTotal(t *testing.T) {
 }
 
 func TestAvailableCopiesWithLoan(t *testing.T) {
-	tx := db.Begin()
+	tx := TestDb()
 	defer tx.Rollback()
 
 	user := User{
@@ -53,13 +53,13 @@ func TestAvailableCopiesWithLoan(t *testing.T) {
 		LastName:  "User",
 		Email:     "test@example.com",
 	}
-	db.Save(&user)
+	tx.Save(&user)
 
 	book := BookWork{
 		ID:    "test-book-id-2",
 		Title: "Test Book 2",
 	}
-	db.Save(&book)
+	tx.Save(&book)
 
 	copy1 := BookCopy{
 		BookWorkID: book.ID,
@@ -71,8 +71,8 @@ func TestAvailableCopiesWithLoan(t *testing.T) {
 		Format:     BookFmtPaperback,
 		Status:     CopyStatusPublic,
 	}
-	db.Save(&copy1)
-	db.Save(&copy2)
+	tx.Save(&copy1)
+	tx.Save(&copy2)
 
 	loan := Loan{
 		BookCopyID:   copy1.ID,
@@ -80,7 +80,7 @@ func TestAvailableCopiesWithLoan(t *testing.T) {
 		DateCheckout: NilTime,
 		DateReturned: NilTime,
 	}
-	db.Save(&loan)
+	tx.Save(&loan)
 
 	counts, err := book.AvailableCopies(true)
 	if err != nil {

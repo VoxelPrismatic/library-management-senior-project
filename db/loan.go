@@ -61,6 +61,7 @@ func (l Loan) Status() LoanStatusFlag {
 
 // Marks a book as returned
 func (c *Loan) Return() error {
+	db := Db()
 	c.DateReturned = time.Now()
 	return db.Save(c).Error
 }

@@ -6,7 +6,7 @@ import (
 )
 
 func TestUserCheckedOut(t *testing.T) {
-	tx := db.Begin()
+	tx := TestDb()
 	defer tx.Rollback()
 
 	user := User{
@@ -14,20 +14,20 @@ func TestUserCheckedOut(t *testing.T) {
 		LastName:  "User",
 		Email:     "test@example.com",
 	}
-	db.Save(&user)
+	tx.Save(&user)
 
 	book := BookWork{
 		ID:    "test-book-id",
 		Title: "Test Book",
 	}
-	db.Save(&book)
+	tx.Save(&book)
 
 	copy := BookCopy{
 		BookWorkID: book.ID,
 		Format:     BookFmtPaperback,
 		Status:     CopyStatusPublic,
 	}
-	db.Save(&copy)
+	tx.Save(&copy)
 
 	loan := Loan{
 		BookCopyID:   copy.ID,
@@ -35,7 +35,7 @@ func TestUserCheckedOut(t *testing.T) {
 		DateCheckout: time.Now().Add(-DAY),
 		DateReturned: NilTime,
 	}
-	db.Save(&loan)
+	tx.Save(&loan)
 
 	checkedOut, err := user.CheckedOut()
 	if err != nil {
@@ -47,7 +47,7 @@ func TestUserCheckedOut(t *testing.T) {
 }
 
 func TestUserHasOverdueBooks(t *testing.T) {
-	tx := db.Begin()
+	tx := TestDb()
 	defer tx.Rollback()
 
 	user := User{
@@ -55,20 +55,20 @@ func TestUserHasOverdueBooks(t *testing.T) {
 		LastName:  "User",
 		Email:     "test@example.com",
 	}
-	db.Save(&user)
+	tx.Save(&user)
 
 	book := BookWork{
 		ID:    "test-book-id",
 		Title: "Test Book",
 	}
-	db.Save(&book)
+	tx.Save(&book)
 
 	copy := BookCopy{
 		BookWorkID: book.ID,
 		Format:     BookFmtPaperback,
 		Status:     CopyStatusPublic,
 	}
-	db.Save(&copy)
+	tx.Save(&copy)
 
 	loan := Loan{
 		BookCopyID:   copy.ID,
@@ -76,7 +76,7 @@ func TestUserHasOverdueBooks(t *testing.T) {
 		DateCheckout: time.Now().Add(-LOAN_DURATION * 2),
 		DateReturned: NilTime,
 	}
-	db.Save(&loan)
+	tx.Save(&loan)
 
 	hasOverdue, err := user.HasOverdueBooks()
 	if err != nil {

@@ -6,9 +6,6 @@ import (
 )
 
 func TestHoldStatusCompleted(t *testing.T) {
-	tx := db.Begin()
-	defer tx.Rollback()
-
 	hold := Hold{
 		FulfilledDate: time.Now(),
 	}
@@ -23,9 +20,6 @@ func TestHoldStatusCompleted(t *testing.T) {
 }
 
 func TestHoldStatusCancelled(t *testing.T) {
-	tx := db.Begin()
-	defer tx.Rollback()
-
 	hold := Hold{
 		CancelledDate: time.Now(),
 	}
@@ -40,7 +34,7 @@ func TestHoldStatusCancelled(t *testing.T) {
 }
 
 func TestHoldStatusQueued(t *testing.T) {
-	tx := db.Begin()
+	tx := TestDb()
 	defer tx.Rollback()
 
 	user := User{
@@ -49,18 +43,17 @@ func TestHoldStatusQueued(t *testing.T) {
 		Email:     "test@example.com",
 		Status:    UserStatusActive,
 	}
-	db.Save(&user)
+	tx.Save(&user)
 
 	book := BookWork{
 		ID:    "test-book-id",
 		Title: "Test Book",
 	}
-	db.Save(&book)
+	tx.Save(&book)
 
 	hold := Hold{
-		User:       user,
-		UserID:     user.ID,
-		BookWorkID: SqlUUID{},
+		User:   user,
+		UserID: user.ID,
 	}
 
 	status, err := hold.Status()

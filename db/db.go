@@ -13,8 +13,7 @@ import (
 func connect() *gorm.DB {
 	var target gorm.Dialector
 	if testing.Testing() {
-		// target = sqlite.Open("file::memory:?cache=shared")
-		target = sqlite.Open("testing.db")
+		target = sqlite.Open("file::memory:?cache=shared")
 	} else {
 		target = sqlite.Open("senior-library.db")
 	}
@@ -26,12 +25,13 @@ func connect() *gorm.DB {
 	return db
 }
 
-var db = connect()
+var _db = connect()
+var _tx *gorm.DB = nil
 
 // Automatically migrate several structs to the database
 func Migrate(models ...any) bool {
 	for _, model := range models {
-		err := db.AutoMigrate(model)
+		err := _db.AutoMigrate(model)
 		if err != nil {
 			fmt.Printf("\x1b[91;1mpanic: %s\x1b[0m\n", reflect.TypeOf(model).Name())
 			panic(err)
@@ -43,12 +43,23 @@ func Migrate(models ...any) bool {
 
 // Retrieve a copy of the database pointer.
 func Db() *gorm.DB {
-	return db
+	if testing.Testing() {
+		return _tx
+	}
+	return _db
 }
 
 func MustSave(obj any) {
-	state := db.Save(obj)
+	state := _db.Save(obj)
 	if state.Error != nil {
 		panic(state.Error)
 	}
+}
+
+func TestDb() *gorm.DB {
+	if !testing.Testing() {
+		panic("should never be called outside of testing environment")
+	}
+	_tx = _db.Begin()
+	return _tx
 }

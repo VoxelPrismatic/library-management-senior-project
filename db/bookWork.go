@@ -87,6 +87,7 @@ func (v *BookVariants) Add(b BookWork) {
 
 // Gets all the editions matching this title and author
 func (b *BookWork) Editions() ([]BookWork, error) {
+	db := Db()
 	ret := []BookWork{}
 	status := db.Where(&BookWork{
 		Title:   b.Title,
@@ -97,6 +98,7 @@ func (b *BookWork) Editions() ([]BookWork, error) {
 
 // Lists all copies from all editions
 func (b *BookWork) AllCopies() (CopyList, error) {
+	db := Db()
 	ret := []BookCopy{}
 	status := db.Joins("book_copies").Where(&BookWork{
 		Title:    b.Title,
@@ -109,6 +111,7 @@ func (b *BookWork) AllCopies() (CopyList, error) {
 
 // Strictly matches against this particular edition
 func (b *BookWork) CopiesStrict() (CopyList, error) {
+	db := Db()
 	ret := []BookCopy{}
 	status := db.Where(&BookCopy{
 		BookWorkID: b.ID,
@@ -132,6 +135,7 @@ type copyCountInter struct {
 // If 'strict' is true, then only copies for this particular book ID will be returned
 // If 'strict' is false, then copies matching the title and authors will be returned, too
 func (b *BookWork) AvailableCopies(strict bool) (FormatsMap[CopyCount], error) {
+	db := Db()
 	ids := []string{b.ID}
 	if !strict {
 		err := db.Where(&BookWork{

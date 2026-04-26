@@ -82,6 +82,7 @@ func (arr CopyList) MapFormats() FormatsMap[CopyList] {
 }
 
 func (c BookCopy) LoanHistory() ([]Loan, error) {
+	db := Db()
 	ret := []Loan{}
 	status := db.Preload("users").
 		Preload("book_copies").
