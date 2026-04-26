@@ -1,7 +1,6 @@
 package db
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -19,34 +18,7 @@ type Hold struct {
 	CancelledDate time.Time
 }
 
-type HoldStatus int
-
-const (
-	HoldQueued    HoldStatus = 1 << iota // User in queue
-	HoldCancelled                        // User canceled hold
-	HoldPostponed                        // User have outstanding charges and cannot check out books right now
-	HoldCompleted                        // User has checked out the book
-	HoldRevoked                          // User account has been deleted
-)
-
-func (h HoldStatus) String() string {
-	switch h {
-	case HoldQueued:
-		return "HoldQueued"
-	case HoldCancelled:
-		return "HoldCancelled"
-	case HoldPostponed:
-		return "HoldPostponed"
-	case HoldCompleted:
-		return "HoldCompleted"
-	case HoldRevoked:
-		return "HoldRevoked"
-	default:
-		return fmt.Sprintf("HoldStatus(%d)", h)
-	}
-}
-
-func (h Hold) Status() (HoldStatus, error) {
+func (h Hold) Status() (HoldStatusFlag, error) {
 	if !h.FulfilledDate.IsZero() {
 		return HoldCompleted, nil
 	}

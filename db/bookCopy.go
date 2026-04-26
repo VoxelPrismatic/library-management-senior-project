@@ -1,6 +1,8 @@
 package db
 
-import "time"
+import (
+	"time"
+)
 
 var _ = Migrate(BookCopy{}, RepairLog{})
 
@@ -24,45 +26,6 @@ type RepairLog struct {
 	OutgoingStatus CopyStatusFlag
 	TechnicianName string
 }
-
-type BookFmtFlag int
-
-const (
-	BookFmtPaperback     BookFmtFlag = 1 << iota // Physical paperback book
-	BookFmtHardCover                             // Physical hard-cover book
-	BookFmtPhysicalAudio                         // E.g. a physical MP3 player with the book preloaded
-	BookFmtDigitalBook                           // E.g. Kindle
-	BookFmtDigitalAudio                          // E.g. Audible
-)
-
-type ConditionFlag int
-
-const (
-	ConditionMint ConditionFlag = iota // New from the factory
-	ConditionGood                      // No major wear, but some pages are bent
-	ConditionFair                      // Light wear on corners, crease marks, but no torn pages
-	ConditionPoor                      // Some tears, annotations, etc
-	ConditionDead                      // Missing pages
-)
-
-type CopyStatusFlag int
-
-const (
-	CopyStatusPublic        CopyStatusFlag = iota // Open to the public
-	CopyStatusPendingReturn                       // Book is checked out, waiting to be removed
-	CopyStatusPendingAction                       // Book is returned, but waiting for action (repair or discard)
-	CopyStatusRepairing                           // Book is being repaired (rebound, etc.)
-	CopyStatusDiscarded                           // Book is discarded, possibly replaced
-)
-
-type CopyLoanFlag int
-
-const (
-	CopyLoanAvailable  CopyLoanFlag = 1 << iota // Open to the public
-	CopyLoanUnvailable                          // Book is checked out
-	CopyLoanOverdue                             // Book is checked out and overdue
-	CopyLoanWithdrawn                           // Book is withdrawn from circulation until repairs are complete
-)
 
 type FormatsMap[T any] map[BookFmtFlag]T
 type CopyList []BookCopy

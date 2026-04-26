@@ -1,7 +1,6 @@
 package db
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -29,14 +28,6 @@ type Loan struct {
 	IncomingCondition ConditionFlag
 }
 
-type LoanStatusFlag int
-
-const (
-	LoanStatusReturned LoanStatusFlag = 1 << iota
-	LoanStatusCheckedOut
-	LoanStatusOverdue
-)
-
 func (s LoanStatusFlag) ToCopyStatus() CopyLoanFlag {
 	switch s {
 	case LoanStatusReturned:
@@ -47,19 +38,6 @@ func (s LoanStatusFlag) ToCopyStatus() CopyLoanFlag {
 		return CopyLoanOverdue
 	default:
 		panic("unreachable")
-	}
-}
-
-func (s LoanStatusFlag) String() string {
-	switch s {
-	case LoanStatusReturned:
-		return "LoanStatusReturned"
-	case LoanStatusCheckedOut:
-		return "LoanStatusCheckedOut"
-	case LoanStatusOverdue:
-		return "LoanStatusOverdue"
-	default:
-		return fmt.Sprintf("LoanStatusFlag(%d)", s)
 	}
 }
 
