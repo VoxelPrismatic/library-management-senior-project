@@ -56,6 +56,7 @@ type JwtEntry struct {
 }
 
 func (u *User) IssueJWT() JwtEntry {
+	db := Db()
 	fmt.Println("\x1b[94;1mPre-JWT\x1b[0m")
 	db.Save(&u)
 	header := ToJsonB64(map[string]string{

@@ -67,6 +67,7 @@ type UserPartial struct {
 }
 
 func (p UserPartial) Fetch() (User, error) {
+	db := Db()
 	id, err := uuid.Parse(p.ID)
 	if err != nil {
 		return User{}, err
@@ -111,6 +112,7 @@ func (u *User) SetLastName(name string) error {
 }
 
 func (u *User) SetEmail(addr string) error {
+	db := Db()
 	addr = strings.TrimSpace(addr)
 	if addr == "" {
 		return fmt.Errorf("email cannot be blank")
