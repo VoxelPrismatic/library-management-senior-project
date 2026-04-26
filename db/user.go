@@ -46,9 +46,11 @@ const (
 func (u User) CheckedOut() ([]Loan, error) {
 	db := Db()
 	ret := []Loan{}
-	status := db.Preload("users").Model(&Loan{}).
+	status := db.Model(&Loan{}).
 		Where("user_id = ?", u.ID).
 		Where("date_returned = ?", nil).
+		Preload("User").
+		Preload("BookCopy").
 		Find(&ret)
 	return ret, status.Error
 }
@@ -56,10 +58,12 @@ func (u User) CheckedOut() ([]Loan, error) {
 func (u User) HasOverdueBooks() (bool, error) {
 	db := Db()
 	count := int64(0)
-	status := db.Preload("users").Model(&Loan{}).
+	status := db.Model(&Loan{}).
 		Where("user_id = ?", u.ID).
 		Where("date_returned = ?", nil).
 		Where("date_checkout < ?", time.Now().Add(-LOAN_DURATION)).
+		Preload("User").
+		Preload("BookCopy").
 		Count(&count)
 	return count == 0, status.Error
 }
