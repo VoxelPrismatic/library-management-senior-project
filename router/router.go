@@ -23,6 +23,9 @@ func Router(w http.ResponseWriter, r *http.Request) {
 	case "management":
 		ManagementRouter(p)
 
+	case "user":
+		UserRouter(p)
+
 	case "":
 		fail.Render(p, pages.HomePage())
 	}

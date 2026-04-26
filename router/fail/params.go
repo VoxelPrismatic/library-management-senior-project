@@ -11,7 +11,7 @@ type RoutingParams struct {
 	Req      *http.Request
 	SubPtr   int
 	FullPath []string
-	User     *db.User
+	User     *db.UserPartial
 }
 
 func (p *RoutingParams) Pop() string {
@@ -30,7 +30,7 @@ func MakeParams(writer http.ResponseWriter, request *http.Request) *RoutingParam
 	ret := RoutingParams{
 		W:        writer,
 		Req:      request,
-		User:     &u,
+		User:     u,
 		SubPtr:   0,
 		FullPath: p,
 	}
@@ -56,4 +56,12 @@ func (p *RoutingParams) SubPathTree(include bool) string {
 		plus++
 	}
 	return "/" + strings.Join(p.FullPath[:plus], "/")
+}
+
+func (p RoutingParams) Form() map[string]string {
+	ret := map[string]string{}
+	for k, v := range p.Req.Form {
+		ret[k] = strings.TrimSpace(v[0])
+	}
+	return ret
 }
