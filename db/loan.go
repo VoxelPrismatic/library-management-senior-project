@@ -67,7 +67,7 @@ func (l Loan) Status() LoanStatusFlag {
 	if !l.DateReturned.IsZero() {
 		return LoanStatusReturned
 	}
-	if l.DateReturned.Add(LOAN_DURATION).Before(time.Now()) {
+	if l.DateCheckout.Add(LOAN_DURATION).Before(time.Now()) {
 		return LoanStatusOverdue
 	}
 	return LoanStatusCheckedOut

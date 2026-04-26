@@ -30,7 +30,7 @@ func TestLoanStatusCheckedOut(t *testing.T) {
 
 func TestLoanStatusOverdue(t *testing.T) {
 	loan := Loan{
-		DateCheckout: time.Now().Add(-LOAN_DURATION * 2),
+		DateCheckout: time.Now().Add(-LOAN_DURATION + 1),
 		DateReturned: NilTime,
 	}
 
