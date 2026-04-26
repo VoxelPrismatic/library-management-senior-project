@@ -6,7 +6,8 @@ import (
 )
 
 func TestUserCheckedOut(t *testing.T) {
-	setupTestDb(t)
+	tx := db.Begin()
+	defer tx.Rollback()
 
 	user := User{
 		FirstName: "Test",
@@ -46,7 +47,8 @@ func TestUserCheckedOut(t *testing.T) {
 }
 
 func TestUserHasOverdueBooks(t *testing.T) {
-	setupTestDb(t)
+	tx := db.Begin()
+	defer tx.Rollback()
 
 	user := User{
 		FirstName: "Test",

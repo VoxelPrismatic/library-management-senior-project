@@ -6,7 +6,8 @@ import (
 )
 
 func TestHoldStatusCompleted(t *testing.T) {
-	setupTestDb(t)
+	tx := db.Begin()
+	defer tx.Rollback()
 
 	hold := Hold{
 		FulfilledDate: time.Now(),
@@ -22,7 +23,8 @@ func TestHoldStatusCompleted(t *testing.T) {
 }
 
 func TestHoldStatusCancelled(t *testing.T) {
-	setupTestDb(t)
+	tx := db.Begin()
+	defer tx.Rollback()
 
 	hold := Hold{
 		CancelledDate: time.Now(),
@@ -38,7 +40,8 @@ func TestHoldStatusCancelled(t *testing.T) {
 }
 
 func TestHoldStatusQueued(t *testing.T) {
-	setupTestDb(t)
+	tx := db.Begin()
+	defer tx.Rollback()
 
 	user := User{
 		FirstName: "Test",

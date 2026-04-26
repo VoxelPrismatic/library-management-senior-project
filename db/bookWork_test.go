@@ -5,7 +5,8 @@ import (
 )
 
 func TestAvailableCopiesTotal(t *testing.T) {
-	setupTestDb(t)
+	tx := db.Begin()
+	defer tx.Rollback()
 
 	book := BookWork{
 		ID:    "test-book-id",
@@ -44,7 +45,8 @@ func TestAvailableCopiesTotal(t *testing.T) {
 }
 
 func TestAvailableCopiesWithLoan(t *testing.T) {
-	setupTestDb(t)
+	tx := db.Begin()
+	defer tx.Rollback()
 
 	user := User{
 		FirstName: "Test",

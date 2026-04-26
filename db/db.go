@@ -3,6 +3,7 @@ package db
 import (
 	"fmt"
 	"reflect"
+	"testing"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -10,7 +11,14 @@ import (
 
 // Create and connect to the database.
 func connect() *gorm.DB {
-	db, err := gorm.Open(sqlite.Open("senior-library.db"), &gorm.Config{})
+	var target gorm.Dialector
+	if testing.Testing() {
+		// target = sqlite.Open("file::memory:?cache=shared")
+		target = sqlite.Open("testing.db")
+	} else {
+		target = sqlite.Open("senior-library.db")
+	}
+	db, err := gorm.Open(target, &gorm.Config{})
 	if err != nil {
 		panic(err)
 	}
@@ -18,7 +26,7 @@ func connect() *gorm.DB {
 	return db
 }
 
-var db *gorm.DB = connect()
+var db = connect()
 
 // Automatically migrate several structs to the database
 func Migrate(models ...any) bool {
