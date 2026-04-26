@@ -36,6 +36,10 @@ func ManagementBooksRouter(p *fail.RoutingParams) {
 }
 
 func HandleManagementBooksAdd(p *fail.RoutingParams) {
+	if fail.Done(p) {
+		return
+	}
+
 	switch p.Req.Method {
 	case http.MethodGet:
 		query := p.Req.URL.Query().Get("q")
