@@ -67,15 +67,15 @@ func TestLoanReturn(t *testing.T) {
 	}
 	tx.Save(&book)
 
-	copy := BookCopy{
+	c := BookCopy{
 		BookWorkID: book.ID,
 		Format:     BookFmtPaperback,
 		Status:     CopyStatusPublic,
 	}
-	tx.Save(&copy)
+	tx.Save(&c)
 
 	loan := Loan{
-		BookCopyID:   copy.ID,
+		BookCopyID:   c.ID,
 		UserID:       user.ID,
 		DateCheckout: time.Now().Add(-DAY),
 		DateReturned: NilTime,
