@@ -1,6 +1,7 @@
 package db
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -46,6 +47,19 @@ func (s LoanStatusFlag) ToCopyStatus() CopyLoanFlag {
 		return CopyLoanOverdue
 	default:
 		panic("unreachable")
+	}
+}
+
+func (s LoanStatusFlag) String() string {
+	switch s {
+	case LoanStatusReturned:
+		return "LoanStatusReturned"
+	case LoanStatusCheckedOut:
+		return "LoanStatusCheckedOut"
+	case LoanStatusOverdue:
+		return "LoanStatusOverdue"
+	default:
+		return fmt.Sprintf("LoanStatusFlag(%d)", s)
 	}
 }
 

@@ -24,7 +24,7 @@ func TestLoanStatusCheckedOut(t *testing.T) {
 	}
 
 	if loan.Status() != LoanStatusCheckedOut {
-		t.Fatalf("loan status: expected LoanStatusCheckedOut, got %d", loan.Status())
+		t.Fatalf("loan status: expected LoanStatusCheckedOut, got %s", loan.Status())
 	}
 }
 
@@ -35,7 +35,7 @@ func TestLoanStatusOverdue(t *testing.T) {
 	}
 
 	if loan.Status() != LoanStatusOverdue {
-		t.Fatalf("loan status: expected LoanStatusOverdue, got %d", loan.Status())
+		t.Fatalf("loan status: expected LoanStatusOverdue, got %s", loan.Status())
 	}
 }
 
@@ -46,7 +46,7 @@ func TestLoanStatusReturned(t *testing.T) {
 	}
 
 	if loan.Status() != LoanStatusReturned {
-		t.Fatalf("loan status: expected LoanStatusReturned, got %d", loan.Status())
+		t.Fatalf("loan status: expected LoanStatusReturned, got %s", loan.Status())
 	}
 }
 

@@ -15,7 +15,7 @@ func TestHoldStatusCompleted(t *testing.T) {
 		t.Fatalf("hold status: unexpected error: %v", err)
 	}
 	if status != HoldCompleted {
-		t.Fatalf("hold status: expected HoldCompleted, got %d", status)
+		t.Fatalf("hold status: expected HoldCompleted, got %s", status)
 	}
 }
 
@@ -29,7 +29,7 @@ func TestHoldStatusCancelled(t *testing.T) {
 		t.Fatalf("hold status: unexpected error: %v", err)
 	}
 	if status != HoldCancelled {
-		t.Fatalf("hold status: expected HoldCancelled, got %d", status)
+		t.Fatalf("hold status: expected HoldCancelled, got %s", status)
 	}
 }
 
@@ -61,6 +61,6 @@ func TestHoldStatusQueued(t *testing.T) {
 		t.Fatalf("hold status: unexpected error: %v", err)
 	}
 	if status != HoldQueued {
-		t.Fatalf("hold status: expected HoldQueued, got %d", status)
+		t.Fatalf("hold status: expected HoldQueued, got %s", status)
 	}
 }

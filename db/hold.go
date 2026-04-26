@@ -1,6 +1,9 @@
 package db
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 var _ = Migrate(Hold{})
 
@@ -25,6 +28,23 @@ const (
 	HoldCompleted                        // User has checked out the book
 	HoldRevoked                          // User account has been deleted
 )
+
+func (h HoldStatus) String() string {
+	switch h {
+	case HoldQueued:
+		return "HoldQueued"
+	case HoldCancelled:
+		return "HoldCancelled"
+	case HoldPostponed:
+		return "HoldPostponed"
+	case HoldCompleted:
+		return "HoldCompleted"
+	case HoldRevoked:
+		return "HoldRevoked"
+	default:
+		return fmt.Sprintf("HoldStatus(%d)", h)
+	}
+}
 
 func (h Hold) Status() (HoldStatus, error) {
 	if !h.FulfilledDate.IsZero() {
