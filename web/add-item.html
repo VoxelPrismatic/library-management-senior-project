@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Item</title>
+    <link rel="stylesheet" href="lms-semtx.css">
+</head>
+<body>
+    <header class="flex">
+            <h1 class="mr-2 my-4 px-4 text-secondary">Town Library Admin</h1>
+            <h3 class="mr-2 my-4 text-secondary">Search</h3>
+            <form class="mr-2 my-4">
+                <input type="text" name="topSearch" id="topSearch" placeholder="Search Items">
+            </form>
+            
+        </header>
+    <main class="flex">
+        <aside class="stack">
+            <a href="#" class="text-secondary">Catalog</a>
+            <a href="#" class="text-secondary">Add Items</a>
+            <a href="#" class="text-secondary">Add Lists</a>
+            <a href="#" class="text-secondary">Admin</a>
+            <a href="#" class="text-secondary">Transactions</a>
+            <a href="#" class="text-secondary">Repair log</a>
+        </aside>
+        <article class="bg-mantle">
+            <h2 class="text-secondary">Search for Books</h2>
+                <form>
+                    <input type="text" name="topSearch" id="topSearch" placeholder="ISBN, Title, Author">
+                </form>
+                <button type="button" id="button" class="btn-primary my-4">Add</button>
+            <h2 class="text-secondary">Results</h2>
+            <div class="card-flat border">
+                <p class="label-uppercase">Skeleton</p>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text"></div>
+            </div>
+            <div class="card-flat border">
+                <p class="label-uppercase">Skeleton</p>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text"></div>
+            </div>
+            
+        </article>
+    </main>
+    <footer class="text-center">&copy; <small>Copyright text</small></footer>
+</body>
+</html>
