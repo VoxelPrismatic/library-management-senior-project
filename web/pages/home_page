@@ -1,0 +1,237 @@
+package pages
+
+import (
+	"fmt"
+	"sort"
+	"strings"
+	"voxelprismatic/library-management-senior-project/db"
+	"voxelprismatic/library-management-senior-project/web/common"
+)
+
+// groups a flat list of BookWork into a sorted map of first-letter -> books
+func groupByLetter(books []db.BookWork) map[string][]db.BookWork {
+	grouped := map[string][]db.BookWork{}
+	for _, b := range books {
+		if b.Title == "" {
+			continue
+		}
+		letter := strings.ToUpper(string([]rune(b.Title)[0]))
+		grouped[letter] = append(grouped[letter], b)
+	}
+	return grouped
+}
+
+// returns sorted letter keys from the grouped map
+func sortedLetters(grouped map[string][]db.BookWork) []string {
+	letters := make([]string, 0, len(grouped))
+	for k := range grouped {
+		letters = append(letters, k)
+	}
+	sort.Strings(letters)
+	return letters
+}
+
+// counts total copies across all formats for a book
+func totalCopies(b db.BookWork) int {
+	counts, err := b.AvailableCopies(false)
+	if err != nil {
+		return 0
+	}
+	total := 0
+	for _, c := range counts {
+		total += c.Total
+	}
+	return total
+}
+
+// BookThumbCard renders a single book card in the catalog grid
+templ BookThumbCard(b db.BookWork) {
+	<article class="book-thumb" tabindex="0" aria-label={ b.Title }>
+		<div class="book-cover">
+			<img
+				src={ b.CoverThumb }
+				alt={ b.Title + " cover" }
+				loading="lazy"
+				onerror="this.style.display='none';this.parentElement.querySelector('.book-cover-placeholder').style.display='flex'"
+			/>
+			<div class="book-cover-placeholder">{ b.Title }</div>
+		</div>
+		<div class="book-label">
+			{ b.Title }
+			<span class="copy-count">({ fmt.Sprintf("%d", totalCopies(b)) })</span>
+		</div>
+	</article>
+}
+
+// HomePage renders the full library admin homepage
+templ HomePage(books []db.BookWork) {
+	@common.Head("Town Library Admin", "Library catalog management")
+	<body>
+	<div class="app">
+
+		<header>
+			<nav>
+				<div>
+					<strong>Town Library Admin</strong>
+				</div>
+				<div>
+					<label for="header-q">Search</label>
+					<input
+						id="header-q"
+						type="search"
+						placeholder=""
+						class="text-sm"
+						style="width:160px"
+						aria-label="Search library catalog"
+						hx-get="/management/books/search"
+						hx-target="#global-search-results"
+						hx-swap="innerHTML"
+						hx-trigger="keyup changed delay:400ms"
+					/>
+				</div>
+			</nav>
+		</header>
+
+		<div class="body-row">
+
+			<aside class="sidebar">
+				<nav>
+					<a href="#" id="nav-catalog" class="active" onclick="showView('catalog'); return false;">Catalog</a>
+					<a href="#" id="nav-add" onclick="showView('add'); return false;">Add Items</a>
+					<a href="/lists">Add Lists</a>
+					<hr/>
+					<a href="/admin">Admin</a>
+					<a href="/holds">Holds</a>
+					<a href="/fines">Fines</a>
+					<a href="/repair-log">Repair Log</a>
+				</nav>
+			</aside>
+
+			<main>
+
+				<div id="global-search-results" aria-live="polite"></div>
+
+				// catalog view — books passed in from the router query
+				<section id="view-catalog" aria-label="Book catalog">
+
+					<div class="catalog-toolbar">
+						<span class="catalog-title">Catalog({ fmt.Sprintf("%d", len(books)) })</span>
+						<button class="btn btn-sm btn-outline" onclick="showView('add')">+ Add</button>
+						<select class="text-sm" aria-label="Sort by" style="height:28px;padding:0 6px;border:1px solid var(--bg-mantle);border-radius:4px;background:var(--bg-surface)">
+							<option>Title</option>
+							<option>Author</option>
+							<option>Newest</option>
+						</select>
+						<button class="btn btn-sm btn-outline">Filter</button>
+					</div>
+
+					<nav class="alpha-strip" aria-label="Jump to letter">
+						<a href="#letter-A">A</a><a href="#letter-B">B</a><a href="#letter-C">C</a>
+						<a href="#letter-D">D</a><a href="#letter-E">E</a><a href="#letter-F">F</a>
+						<a href="#letter-G">G</a><a href="#letter-H">H</a><a href="#letter-I">I</a>
+						<a href="#letter-J">J</a><a href="#letter-K">K</a><a href="#letter-L">L</a>
+						<a href="#letter-M">M</a><a href="#letter-N">N</a><a href="#letter-O">O</a>
+						<a href="#letter-P">P</a><a href="#letter-Q">Q</a><a href="#letter-R">R</a>
+						<a href="#letter-S">S</a><a href="#letter-T">T</a><a href="#letter-U">U</a>
+						<a href="#letter-V">V</a><a href="#letter-W">W</a><a href="#letter-X">X</a>
+						<a href="#letter-Y">Y</a><a href="#letter-Z">Z</a><a href="#letter-NUM">#</a>
+					</nav>
+
+					<div class="catalog-content">
+						// loop over books grouped by first letter — no hardcoded data
+						for _, letter := range sortedLetters(groupByLetter(books)) {
+							<section class="alpha-section" id={ "letter-" + letter }>
+								<h2>{ letter }</h2>
+								<div class="books-row">
+									for _, b := range groupByLetter(books)[letter] {
+										@BookThumbCard(b)
+									}
+								</div>
+							</section>
+						}
+					</div>
+
+					<div class="home-bar">
+						<a href="/" aria-label="Home">⌂</a>
+					</div>
+
+				</section>
+
+				// add items view
+				<section id="view-add" aria-label="Search and add books">
+
+					<div class="add-panel">
+						<article>
+							<header>
+								<h1>Search For Books</h1>
+							</header>
+
+							<label for="book-search" class="sr-only">Search by ISBN, Title, or Author</label>
+							<input
+								id="book-search"
+								type="search"
+								placeholder="ISBN, Title, Author"
+								style="width:100%"
+								hx-get="/management/books/add"
+								hx-target="#search-results"
+								hx-swap="outerHTML"
+								hx-trigger="keyup changed delay:400ms"
+								hx-indicator="#search-indicator"
+							/>
+
+							// semtx styles this progress bar as a loading indicator automatically
+							<progress id="search-indicator" class="htmx-indicator" style="width:100%;margin-top:0.5rem"></progress>
+
+							// htmx replaces this with the BookMgmtSearchGrid response
+							<div id="search-results" style="margin-top:1rem">
+								<p class="results-heading">Type to search...</p>
+							</div>
+						</article>
+					</div>
+
+					<div class="home-bar">
+						<a href="/" aria-label="Home">⌂</a>
+					</div>
+
+				</section>
+
+			</main>
+		</div>
+
+	</div>
+
+	<script>
+		// switch between catalog and add items views
+		function showView(name) {
+			const catalog = document.getElementById('view-catalog');
+			const add     = document.getElementById('view-add');
+			catalog.style.display = name === 'catalog' ? 'flex' : 'none';
+			add.style.display     = name === 'add'     ? 'flex' : 'none';
+
+			document.getElementById('nav-catalog').classList.toggle('active', name === 'catalog');
+			document.getElementById('nav-add').classList.toggle('active',     name === 'add');
+
+			if (name === 'add') {
+				setTimeout(() => document.getElementById('book-search').focus(), 50);
+			}
+		}
+
+		// highlight the current letter in the alpha strip as user scrolls
+		const catalogContent = document.querySelector('.catalog-content');
+		const alphaSections  = document.querySelectorAll('.alpha-section');
+		const alphaLinks     = document.querySelectorAll('.alpha-strip a');
+
+		catalogContent && catalogContent.addEventListener('scroll', () => {
+			let current = '';
+			alphaSections.forEach(sec => {
+				if (sec.offsetTop - catalogContent.scrollTop <= 40) {
+					current = sec.id.replace('letter-', '');
+				}
+			});
+			alphaLinks.forEach(a => {
+				a.classList.toggle('active', a.textContent.trim() === current);
+			});
+		});
+	</script>
+	</body>
+}
