@@ -1,0 +1,103 @@
+package pages
+
+import (
+    "voxelprismatic/library-management-senior-project/db"
+    "voxelprismatic/library-management-senior-project/web/book"
+    "voxelprismatic/library-management-senior-project/web/common"
+)
+
+templ FrontPage() {
+    @common.Head("Front Page", "Your community library")
+    <link rel="stylesheet" type="text/css" href="/assets/css/frontpage.css"/>
+    @common.NavHead("", "")
+    <main class="front-main">
+
+        <section aria-label="New and Upcoming Releases">
+            <div class="section-label">New &amp; Upcoming releases</div>
+            <div class="carousel-wrapper" id="carousel-wrapper">
+                <button class="carousel-btn prev" onclick="slide(-1)" aria-label="Previous">
+                    <i class="material-icons">chevron_left</i>
+                </button>
+                <div class="carousel-track-outer">
+                    <div class="carousel-track" id="carousel-track">
+                        for _, b := range getLatestBooks(12) {
+                            @book.BookCover(b)
+                        }
+                    </div>
+                </div>
+                <button class="carousel-btn next" onclick="slide(1)" aria-label="Next">
+                    <i class="material-icons">chevron_right</i>
+                </button>
+                <div class="carousel-dots" id="carousel-dots" aria-hidden="true"></div>
+            </div>
+        </section>
+
+        <aside class="picks-panel" aria-label="Staff picks">
+            <a href="/lists/staff-april" class="pick-card">
+                <img src="https://covers.openlibrary.org/b/id/12818862-M.jpg" alt="April staff pick"/>
+                <div class="pick-info">
+                    <div class="pick-label">April 2026</div>
+                    <div class="pick-title">Staff Pick List</div>
+                    <span class="badge badge-red">Curated</span>
+                </div>
+            </a>
+            <a href="/lists/poetry-month" class="pick-card">
+                <img src="https://covers.openlibrary.org/b/id/10521270-M.jpg" alt="Poetry Month"/>
+                <div class="pick-info">
+                    <div class="pick-label">May Feature</div>
+                    <div class="pick-title">Poetry Month</div>
+                    <span class="badge badge-green">Reading List</span>
+                </div>
+            </a>
+            <a href="/lists/hockey-fever" class="pick-card">
+                <img src="https://covers.openlibrary.org/b/id/14651983-M.jpg" alt="Hockey Fever"/>
+                <div class="pick-info">
+                    <div class="pick-label">Trending</div>
+                    <div class="pick-title">Hockey Fever</div>
+                    <span class="badge badge-red">Sports &amp; Lit</span>
+                </div>
+            </a>
+            <a href="/lists/summer-reads" class="pick-card">
+                <img src="https://covers.openlibrary.org/b/id/10784161-M.jpg" alt="Summer Reads"/>
+                <div class="pick-info">
+                    <div class="pick-label">Coming Soon</div>
+                    <div class="pick-title">Summer Reads</div>
+                    <span class="badge badge-green">Seasonal</span>
+                </div>
+            </a>
+        </aside>
+
+    </main>
+    @common.Footer()
+    <script>
+        const VISIBLE = 3;
+        let current = 0;
+        const track = document.getElementById('carousel-track');
+        const dotsEl = document.getElementById('carousel-dots');
+        function getItems() { return track.querySelectorAll('.well'); }
+        function totalPages() { return Math.ceil(getItems().length / VISIBLE); }
+        function buildDots() {
+            dotsEl.innerHTML = '';
+            for (let i = 0; i < totalPages(); i++) {
+                const d = document.createElement('span');
+                d.className = 'dot' + (i === 0 ? ' active' : '');
+                d.onclick = () => goTo(i);
+                dotsEl.appendChild(d);
+            }
+        }
+        function updateDots() {
+            dotsEl.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === current));
+        }
+        function goTo(page) {
+            const items = getItems();
+            if (!items.length) return;
+            const itemW = items[0].offsetWidth + 12;
+            current = Math.max(0, Math.min(page, totalPages() - 1));
+            track.style.transform = `translateX(-${current * VISIBLE * itemW}px)`;
+            updateDots();
+        }
+        function slide(dir) { goTo(current + dir); }
+        window.addEventListener('load', buildDots);
+        window.addEventListener('resize', () => goTo(current));
+    </script>
+}
