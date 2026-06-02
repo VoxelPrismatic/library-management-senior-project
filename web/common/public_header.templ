@@ -1,0 +1,77 @@
+package common
+
+// TopNavbar is the top navigation bar with logo and search.
+// Extracted from duplicated HTML in user-facing pages (see PR #103).
+templ TopNavbar() {
+	<nav class="navbar">
+		<a href="/" class="navbar-brand">
+			<img src="/assets/img/placeholder.png" alt="Town Library logo">
+			Town Library
+		</a>
+
+		<div class="input-search" style="width: 30%;">
+			<input class="form-input-lg" type="search" name="q" placeholder="Search">
+			<button class="btn-small btn-secondary input-icon">search</button>
+		</div>
+	</nav>
+}
+
+// SubNavbar is the secondary navigation with category dropdowns and account/login links.
+// showAccount controls whether to show My Account/Help or Log in/Register.
+templ SubNavbar(showAccount bool) {
+	<nav class="mt-2" style="border-bottom: solid var(--tertiary);">
+		<div class="navbar-collapse justify-between">
+
+			<ul class="navbar-nav">
+				<li><a href="#">Explore <i class="material-icons">arrow_drop_down</i></a></li>
+				<li><a href="#">Services <i class="material-icons">arrow_drop_down</i></a></li>
+				<li><a href="#">Events <i class="material-icons">arrow_drop_down</i></a></li>
+				<li><a href="#">About Us <i class="material-icons">arrow_drop_down</i></a></li>
+			</ul>
+
+			<ul class="navbar-nav">
+				if showAccount {
+					<li>
+						<a href="/account">
+							<i class="material-icons mb-2">account_circle</i>
+							My Account
+						</a>
+					</li>
+					<li>
+						<a href="/help">
+							<i class="material-icons mb-2">help</i>
+							Help
+						</a>
+					</li>
+				} else {
+					<li>
+						<a href="/user/login">
+							<i class="material-icons mb-2">login</i>
+							Log in
+						</a>
+					</li>
+					<li>
+						<a href="/user/register">
+							<i class="material-icons mb-2">person_add</i>
+							Register
+						</a>
+					</li>
+				}
+			</ul>
+
+		</div>
+	</nav>
+}
+
+// PublicFooter is the standard page footer with copyright and settings.
+// Extracted to avoid duplication across pages.
+templ PublicFooter() {
+	<footer class="page-footer mt-8 flex justify-between">
+		<span></span>
+		<p class="text-s">&#169; 2026 Town Library</p>
+		<!--Link to user Library home page.-->
+		<button class="btn-small btn-ghost">
+			<i class="material-icons mb-2" style="font-size: 24px;">settings</i>
+		</button>
+	</footer>
+}
